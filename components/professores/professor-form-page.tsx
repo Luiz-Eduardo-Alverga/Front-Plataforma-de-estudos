@@ -30,7 +30,7 @@ export function ProfessorForm({ mode }: ProfessorFormProps) {
 
   return (
     <div className="space-y-6">
-      <div className="max-w-4xl">
+      <div>
         <div className="flex items-end justify-between gap-4">
           <div>
             <h2 className="text-lg sm:text-2xl">{title}</h2>
@@ -53,7 +53,7 @@ export function ProfessorForm({ mode }: ProfessorFormProps) {
         </div>
       </div>
 
-      <div className="max-w-4xl">
+      <div>
         <form
           onSubmit={handleSubmit}
           className="bg-card rounded-lg border p-4 sm:p-6"

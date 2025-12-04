@@ -19,6 +19,8 @@ import {
 } from '../ui/dropdown-menu'
 import { MATERIAS_MOCK } from '@/utils/mock/mock-data'
 import { useRouter } from 'next/navigation'
+import { Dialog, DialogTrigger } from '../ui/dialog'
+import { MateriaDeleteDialog } from './materia-delete'
 
 export function MateriasList() {
   const router = useRouter()
@@ -81,23 +83,29 @@ export function MateriasList() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => router.push(`/materias/${materia.id}/editar`)}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive focus:text-destructive">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Dialog>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem className='text-emerald-500 focus:text-emerald-500' onClick={() => router.push(`/materias/${materia.id}/editar`)}>
+                          <Edit className="h-4 w-4 mr-2 text-emerald-500" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DialogTrigger asChild>
+                          <DropdownMenuItem className="text-destructive focus:text-destructive">
+                            <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DialogTrigger>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <MateriaDeleteDialog />
+                  </Dialog>
                 </TableCell>
               </TableRow>
             ))}

@@ -1,4 +1,4 @@
-import { ProfessorForm } from '@/components/professores/professor-page'
+import { ProfessorForm } from '@/components/professores/professor-form-page'
 
 export default async function ProfessorEditFormPage({
   params,
