@@ -2,6 +2,6 @@
 
 import { ProfessorForm } from '@/components/professores/professor-page'
 
-export default function ProfessorFormPage() {
+export default function ProfessorCreateFormPage() {
   return <ProfessorForm mode="create" />
 }

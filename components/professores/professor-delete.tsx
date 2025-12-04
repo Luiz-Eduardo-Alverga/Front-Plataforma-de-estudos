@@ -10,28 +10,14 @@ import { Button } from '../ui/button'
 import { Professor } from '@/utils/mock/mock-data'
 import { AlertTriangle } from 'lucide-react'
 
-interface ProfessorDeleteProps {
-  open: boolean
-  onClose: () => void
-  onConfirm: () => void
-  professor: Professor | null
-}
-
-export function ProfessorDelete({
-  open,
-  onClose,
-  onConfirm,
-  professor,
-}: ProfessorDeleteProps) {
-  if (!professor) return null
+export function ProfessorDeleteDialog() {
 
   const handleConfirm = () => {
-    console.log('Professor deletado:', professor.id)
-    onConfirm()
+    console.log('Professor deletado:')
+
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
           <div className="flex items-center gap-2">
@@ -49,7 +35,7 @@ export function ProfessorDelete({
 
         <div className="space-y-2">
           <p>Tem certeza que deseja excluir o professor:</p>
-          <p className="font-medium">{professor.nome}</p>
+          <p className="font-medium">Professor nome</p>
           <p className="text-muted-foreground">
             Todas as matérias e aulas associadas a este professor também serão
             afetadas.
@@ -57,7 +43,7 @@ export function ProfessorDelete({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline">
             Cancelar
           </Button>
           <Button variant="destructive" onClick={handleConfirm}>
@@ -65,6 +51,5 @@ export function ProfessorDelete({
           </Button>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
   )
 }

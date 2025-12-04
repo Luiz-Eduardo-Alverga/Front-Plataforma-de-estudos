@@ -28,6 +28,8 @@ import {
 } from '../ui/dropdown-menu'
 import { PROFESSORES_MOCK } from '@/utils/mock/mock-data'
 import { useRouter } from 'next/navigation'
+import { Dialog, DialogTrigger } from '../ui/dialog'
+import { ProfessorDeleteDialog } from './professor-delete'
 
 export function ProfessoresList() {
   const router = useRouter()
@@ -104,27 +106,30 @@ export function ProfessoresList() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 mr-2" />
-                          Visualizar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive focus:text-destructive">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Dialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          
+                          <DropdownMenuItem onClick={() => router.push(`/professores/${professor.id}/editar`)} className='text-emerald-500 focus:text-emerald-500'>
+                            <Edit className="h-4 w-4 mr-2 text-emerald-500" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DialogTrigger asChild>
+                            <DropdownMenuItem className="text-destructive focus:text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2 text-destructive" />
+                              Excluir
+                            </DropdownMenuItem>
+                          </DialogTrigger>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+
+                      <ProfessorDeleteDialog />
+                    </Dialog>
                   </TableCell>
                 </TableRow>
               ))}
