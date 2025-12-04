@@ -1,6 +1,6 @@
 'use client'
 
-import { Plus, Edit, Trash2, Eye, MoreVertical } from 'lucide-react'
+import { Plus, Edit, Trash2, MoreVertical } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import {
@@ -88,11 +88,7 @@ export function MateriasList() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Eye className="h-4 w-4 mr-2" />
-                        Visualizar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => router.push(`/materias/${materia.id}/editar`)}>
                         <Edit className="h-4 w-4 mr-2" />
                         Editar
                       </DropdownMenuItem>

@@ -4,13 +4,11 @@ import {
   Plus,
   Edit,
   Trash2,
-  Eye,
   Mail,
   Phone,
   MoreVertical,
 } from 'lucide-react'
 import { Button } from '../ui/button'
-import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import {
   Table,
@@ -52,8 +50,7 @@ export function ProfessoresList() {
         </Button>
       </div>
 
-      <Card>
-        <CardContent className="p-0">
+      <div className="mt-4 rounded-2xl border overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -135,8 +132,7 @@ export function ProfessoresList() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
     </div>
   )
 }
