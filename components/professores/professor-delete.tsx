@@ -1,55 +1,57 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '../ui/dialog'
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction
+} from '../ui/alert-dialog'
+import { deleteProfessor } from '@/services/professor/delete-professor'
 import { Button } from '../ui/button'
-import { Professor } from '@/utils/mock/mock-data'
-import { AlertTriangle } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 
-export function ProfessorDeleteDialog() {
+interface ProfessorDeleteDialogProps {
+  professorId: string
+  professorName: string
+}
 
-  const handleConfirm = () => {
-    console.log('Professor deletado:')
+export function ProfessorDeleteDialog({professorId, professorName}: ProfessorDeleteDialogProps) {
+  const queryClient = useQueryClient()
 
-  }
+ const {mutateAsync: deleteProfessorFn, isPending} = useMutation({
+  mutationFn: () => deleteProfessor({id: professorId}),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['professores'] })
+  },
+ })
 
   return (
-      <DialogContent>
-        <DialogHeader>
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
-            </div>
-            <div>
-              <DialogTitle>Confirmar Exclusão</DialogTitle>
-              <DialogDescription>
-                Esta ação não pode ser desfeita
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-
-        <div className="space-y-2">
-          <p>Tem certeza que deseja excluir o professor:</p>
-          <p className="font-medium">Professor nome</p>
-          <p className="text-muted-foreground">
-            Todas as matérias e aulas associadas a este professor também serão
-            afetadas.
-          </p>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline">
-            Cancelar
+  
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Tem certeza que deseja excluir o professor(a) {professorName}?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta ação não pode ser desfeita. Isso irá excluir permanentemente o professor(a) e remover todos os dados associados.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <Button
+            onClick={async () => {
+              await deleteProfessorFn()
+            }}
+            className='bg-destructive hover:bg-destructive/90'>
+              {isPending ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                </>
+              ) : (
+                'Excluir'
+              )}
           </Button>
-          <Button variant="destructive" onClick={handleConfirm}>
-            Excluir
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+        </AlertDialogFooter>
+      </AlertDialogContent>
   )
 }

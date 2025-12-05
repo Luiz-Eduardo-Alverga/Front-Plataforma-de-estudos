@@ -19,7 +19,7 @@ import {
 } from '../ui/dropdown-menu'
 
 import { useRouter } from 'next/navigation'
-import { Dialog, DialogTrigger } from '../ui/dialog'
+import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
 import { ProfessorDeleteDialog } from './professor-delete'
 import { useQuery } from '@tanstack/react-query'
 import { getProfessores } from '@/services/professor/get-professores'
@@ -111,7 +111,7 @@ export function ProfessoresList() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Dialog>
+                      <AlertDialog>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm">
@@ -130,17 +130,17 @@ export function ProfessoresList() {
                               <Edit className="h-4 w-4 mr-2 text-emerald-500" />
                               Editar
                             </DropdownMenuItem>
-                            <DialogTrigger asChild>
+                            <AlertDialogTrigger asChild>
                               <DropdownMenuItem className="text-destructive focus:text-destructive">
                                 <Trash2 className="h-4 w-4 mr-2 text-destructive" />
                                 Excluir
                               </DropdownMenuItem>
-                            </DialogTrigger>
+                            </AlertDialogTrigger>
                           </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <ProfessorDeleteDialog />
-                      </Dialog>
+                        <ProfessorDeleteDialog professorName={professor.name} professorId={professor.id}/>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}
