@@ -37,7 +37,7 @@ export function ProfessoresList() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h2>Gerenciar Professores</h2>
+          <h2 className="text-2xl font-bold">Professores</h2>
           <p className="text-muted-foreground">
             Cadastre e gerencie os professores da plataforma
           </p>
@@ -139,7 +139,10 @@ export function ProfessoresList() {
                           </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <ProfessorDeleteDialog professorName={professor.name} professorId={professor.id}/>
+                        <ProfessorDeleteDialog
+                          professorName={professor.name}
+                          professorId={professor.id}
+                        />
                       </AlertDialog>
                     </TableCell>
                   </TableRow>

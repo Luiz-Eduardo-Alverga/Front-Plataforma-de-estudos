@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '../ui/select'
 
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Save } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface ProfessorFormProps {
@@ -42,11 +42,9 @@ export function ProfessorForm({ mode }: ProfessorFormProps) {
           <div className="flex items-center gap-2">
             <Button
               onClick={() => router.back()}
-              variant="outline"
-              size="sm"
-              className="shrink-0"
+              className="bg-white text-black hover:bg-white/70"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 text-black" />
               Voltar
             </Button>
           </div>
@@ -119,12 +117,13 @@ export function ProfessorForm({ mode }: ProfessorFormProps) {
               onClick={() => router.back()}
               type="button"
               variant="outline"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto px-12"
             >
               Cancelar
             </Button>
-            <Button type="submit" className="w-full sm:w-auto">
-              {mode === 'create' ? 'Cadastrar' : 'Salvar'}
+            <Button type="submit" className="w-full sm:w-auto px-10! gap-4">
+              <Save className="h-4 w-4" />
+              <span>{mode === 'create' ? 'Cadastrar' : 'Salvar'}</span>
             </Button>
           </div>
         </form>

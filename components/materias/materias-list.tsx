@@ -76,7 +76,7 @@ export function MateriasList() {
                 <TableCell>
                   <Badge
                     variant={
-                      materia.status === 'ativa' ? 'default' : 'secondary'
+                      materia.status === 'ativa' ? 'success' : 'secondary'
                     }
                   >
                     {materia.status}
@@ -91,7 +91,12 @@ export function MateriasList() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem className='text-emerald-500 focus:text-emerald-500' onClick={() => router.push(`/materias/${materia.id}/editar`)}>
+                        <DropdownMenuItem
+                          className="text-emerald-500 focus:text-emerald-500"
+                          onClick={() =>
+                            router.push(`/materias/${materia.id}/editar`)
+                          }
+                        >
                           <Edit className="h-4 w-4 mr-2 text-emerald-500" />
                           Editar
                         </DropdownMenuItem>

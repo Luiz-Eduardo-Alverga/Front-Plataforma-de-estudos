@@ -44,14 +44,13 @@ export function MateriaForm({ mode }: MateriaPageProps) {
             <Button
               onClick={() => router.back()}
               variant="outline"
-              size="sm"
               className="shrink-0"
             >
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Button>
             {mode === 'edit' && (
-              <Button variant="destructive" size="sm" className="shrink-0">
+              <Button variant="destructive" className="shrink-0">
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
