@@ -1,8 +1,8 @@
-import { GetProfessoresResponse } from '@/interfaces/professor'
+import { GetProfessoresResponse } from '@/interfaces/Professor'
 import api from '@/lib/axios'
 
 interface GetProfessoresParams {
-  page: number
+  page?: number
 }
 
 export async function getProfessores({ page }: GetProfessoresParams) {

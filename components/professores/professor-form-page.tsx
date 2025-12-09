@@ -148,7 +148,7 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
 
   return (
     <div className="space-y-6">
-      <FormHeader mode={mode} handleDelete={handleDeleteProfessor} />
+      <FormHeader mode={mode} handleDelete={handleDeleteProfessor} label='Novo' title='Professor' description='o professor' />
 
       <form
         onSubmit={handleSubmit(handleCreateOrUpdateProfessor)}
@@ -202,7 +202,7 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-6 items-end">
+          <div className="grid grid-cols-7 gap-6 items-end ">
             <div className="space-y-2 col-span-7 sm:col-span-3">
               <Label htmlFor="especialidade">Especialidade</Label>
               <Input {...register('speciality')} placeholder="Ex: Matemática" />
