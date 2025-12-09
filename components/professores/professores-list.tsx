@@ -1,7 +1,6 @@
 'use client'
 
-import { Plus, Edit, Trash2, Mail, Phone, MoreVertical } from 'lucide-react'
-import { Button } from '../ui/button'
+import { Mail, Phone } from 'lucide-react'
 import { Badge } from '../ui/badge'
 import {
   Table,
@@ -11,53 +10,58 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
 
-import { useRouter } from 'next/navigation'
-import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
-import { ProfessorDeleteDialog } from './professor-delete'
-import { useQuery } from '@tanstack/react-query'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { AlertDialog } from '../ui/alert-dialog'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getProfessores } from '@/services/professor/get-professores'
 import { ProfessorsEmptyState } from './professor-empty-state'
+import { Pagination } from '../pagination'
+import { ListHeader } from '../header/list-header'
+import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
+import { deleteProfessor } from '@/services/professor/delete-professor'
+import { DeleteEntityDialog } from '../modal/delet-entity'
 
 export function ProfessoresList() {
+  const searchParams = useSearchParams()
   const router = useRouter()
+  const queryClient = useQueryClient()
+
+  const page = Number(searchParams.get('page') ?? '1')
 
   const { data: response } = useQuery({
-    queryKey: ['professores'],
-    queryFn: getProfessores,
+    queryKey: ['professores', page],
+    queryFn: () => getProfessores({ page }),
   })
+
+  const { mutateAsync: deleteProfessorFn, isPending } = useMutation({
+    mutationFn: deleteProfessor,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['professores'] })
+    },
+  })
+
+  function handlePaginate(newPage: number) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', String(newPage))
+
+    router.push(`?${params.toString()}`)
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold">Professores</h2>
-          <p className="text-muted-foreground">
-            Cadastre e gerencie os professores da plataforma
-          </p>
-        </div>
+      <ListHeader
+        title="Professores"
+        description="Cadastre e gerencie os professores da plataforma"
+        newButtonLabel="Novo Professor"
+        newButtonHref="professores"
+        hasData={!!response && response.data.length > 0}
+      />
 
-        {response && response.data.length > 0 && (
-          <Button
-            onClick={() => router.push('/professores/novo')}
-            className="w-full sm:w-auto"
-          >
-            <Plus className="h-4 w-4" />
-            Novo Professor
-          </Button>
-        )}
-      </div>
-
-      {response && response.data.length === 0 && <ProfessorsEmptyState />}
+      {!response || (response.data.length === 0 && <ProfessorsEmptyState />)}
 
       {response && response.data.length > 0 && (
-        <div className="mt-4 rounded-2xl border overflow-hidden">
+        <div className="mt-4 rounded-lg border overflow-hidden shadow">
           <Table>
             <TableHeader>
               <TableRow>
@@ -69,87 +73,74 @@ export function ProfessoresList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {response &&
-                response.data.map((professor) => (
-                  <TableRow key={professor.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <span className="font-medium text-primary">
-                            {professor.name
-                              .split(' ')
-                              .map((n) => n[0])
-                              .join('')
-                              .slice(0, 2)}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-medium">{professor.name}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{professor.speciality}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <span className="flex items-center gap-1">
-                          <Mail className="h-3 w-3" />
-                          {professor.email}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Phone className="h-3 w-3" />
-                          {professor.phone}
+              {response.data.map((professor) => (
+                <TableRow key={professor.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="font-medium text-primary">
+                          {professor.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .slice(0, 2)}
                         </span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          professor.active === 1 ? 'success' : 'secondary'
-                        }
-                      >
-                        {professor.active === 1 ? 'ativo' : 'inativo'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <AlertDialog>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() =>
-                                router.push(
-                                  `/professores/${professor.id}/editar`,
-                                )
-                              }
-                              className="text-emerald-500 focus:text-emerald-500"
-                            >
-                              <Edit className="h-4 w-4 mr-2 text-emerald-500" />
-                              Editar
-                            </DropdownMenuItem>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem className="text-destructive focus:text-destructive">
-                                <Trash2 className="h-4 w-4 mr-2 text-destructive" />
-                                Excluir
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <div>
+                        <p className="font-medium">{professor.name}</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>{professor.speciality}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1">
+                      <span className="flex items-center gap-1">
+                        <Mail className="h-3 w-3" />
+                        {professor.email || 'Não informado'}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        {professor.phone || 'Não informado'}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={professor.active === 1 ? 'success' : 'secondary'}
+                    >
+                      {professor.active === 1 ? 'ativo' : 'inativo'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <AlertDialog>
+                      <TableDropdwonMenu
+                        itemHref="professores"
+                        id={professor.id}
+                      />
 
-                        <ProfessorDeleteDialog
-                          professorName={professor.name}
-                          professorId={professor.id}
-                        />
-                      </AlertDialog>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <DeleteEntityDialog
+                        deleteFn={async (id) => {
+                          await deleteProfessorFn({ id })
+                        }}
+                        entityId={String(professor.id)}
+                        entityName="professor"
+                        isLoading={isPending}
+                      />
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
+      )}
+
+      {response && response.meta.last_page > 1 && (
+        <Pagination
+          pageIndex={page}
+          pages={response.meta.last_page}
+          onPageChange={handlePaginate}
+        />
       )}
     </div>
   )

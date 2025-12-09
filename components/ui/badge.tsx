@@ -22,13 +22,13 @@ export function Badge({
       'bg-destructive text-destructive-foreground hover:bg-destructive/80',
     outline:
       'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-    success: 'bg-success text-white hover:bg-success/80',
+    success: 'bg-success text-text-success hover:bg-success/80',
     warning: 'bg-warning text-white hover:bg-warning/80',
   }
 
   return (
     <div
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variants[variant]} ${className}`}
+      className={`inline-flex font-semibold text-sm  items-center rounded-full px-2.5 py-0.5 transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${variants[variant]} ${className}`}
       {...props}
     />
   )

@@ -8,7 +8,7 @@
   --color-card-foreground: #09090b;
   --color-popover: #ffffff;
   --color-popover-foreground: #09090b;
-  --color-primary: #1d1f2e;
+  --color-primary: #212529;
   --color-primary-foreground: #fafafa;
   --color-secondary: #f4f4f5;
   --color-secondary-foreground: #18181b;
@@ -21,8 +21,10 @@
   --color-border: #e4e4e7;
   --color-input: #e4e4e7;
   --color-ring: #4f46e5;
-  --color-success: #22c55e;
+  --color-success: #DCFCE7;
+  --color-text-success: #166534;
   --color-warning: #f59e0b;
+  --color-yellowButton: #ffcc00;
   
   /* Radius */
   --radius: 0.5rem;

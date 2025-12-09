@@ -1,57 +1,72 @@
 'use client'
 
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, GraduationCap, UserCircle, FileText, CheckCircle, BarChart3 } from "lucide-react";
-import { ImageWithFallback } from "@/components/images/imageWithFallback";
-import Link from "next/link";
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  BookOpen,
+  GraduationCap,
+  UserCircle,
+  FileText,
+  CheckCircle,
+  BarChart3,
+} from 'lucide-react'
+import { ImageWithFallback } from '@/components/images/imageWithFallback'
+import Link from 'next/link'
 
 interface LandingPageProps {
-  onLogin: () => void;
-  onRegister: () => void;
+  onLogin: () => void
+  onRegister: () => void
 }
 
 export default function LandingPage({ onLogin }: LandingPageProps) {
   const features = [
     {
       icon: BookOpen,
-      title: "Matérias",
-      description: "Organize e gerencie todas as matérias do curso de forma centralizada",
+      title: 'Matérias',
+      description:
+        'Organize e gerencie todas as matérias do curso de forma centralizada',
     },
     {
       icon: GraduationCap,
-      title: "Aulas",
-      description: "Acompanhe o cronograma e conteúdo de cada aula ministrada",
+      title: 'Aulas',
+      description: 'Acompanhe o cronograma e conteúdo de cada aula ministrada',
     },
     {
       icon: UserCircle,
-      title: "Professores",
-      description: "Gerencie informações e disciplinas dos professores",
+      title: 'Professores',
+      description: 'Gerencie informações e disciplinas dos professores',
     },
     {
       icon: FileText,
-      title: "Provas",
-      description: "Controle datas, horários e resultados das avaliações",
+      title: 'Provas',
+      description: 'Controle datas, horários e resultados das avaliações',
     },
-  ];
+  ]
 
   const benefits = [
     {
       icon: CheckCircle,
-      title: "Gestão Simplificada",
-      description: "Interface intuitiva para gerenciar todo o conteúdo educacional",
+      title: 'Gestão Simplificada',
+      description:
+        'Interface intuitiva para gerenciar todo o conteúdo educacional',
     },
     {
       icon: BarChart3,
-      title: "Acompanhamento",
-      description: "Visualize o progresso e desempenho de forma clara e objetiva",
+      title: 'Acompanhamento',
+      description:
+        'Visualize o progresso e desempenho de forma clara e objetiva',
     },
     {
       icon: GraduationCap,
-      title: "Organização",
-      description: "Mantenha todas as informações organizadas em um só lugar",
+      title: 'Organização',
+      description: 'Mantenha todas as informações organizadas em um só lugar',
     },
-  ];
+  ]
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,18 +102,25 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
               Plataforma de Estudos Completa
             </h1>
             <p className="text-muted-foreground text-lg sm:text-xl">
-              Gerencie matérias, aulas, professores e provas em um único lugar. 
-              Simplifique a gestão educacional e foque no que realmente importa: o aprendizado.
+              Gerencie matérias, aulas, professores e provas em um único lugar.
+              Simplifique a gestão educacional e foque no que realmente importa:
+              o aprendizado.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href={"/login"}>
-                <Button size="lg" onClick={onLogin}>
+              <Link href={'/login'}>
+                <Button size="lg" className="w-full" onClick={onLogin}>
                   Começar Agora
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" onClick={() => {
-                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => {
+                  document
+                    .getElementById('features')
+                    ?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              >
                 Conhecer Funcionalidades
               </Button>
             </div>
@@ -121,7 +143,8 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl mb-4">Funcionalidades</h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Tudo que você precisa para gerenciar uma plataforma educacional completa
+              Tudo que você precisa para gerenciar uma plataforma educacional
+              completa
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -153,9 +176,12 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
             </div>
             <div className="order-1 lg:order-2 space-y-8">
               <div>
-                <h2 className="text-3xl sm:text-4xl mb-4">Por que escolher nossa plataforma?</h2>
+                <h2 className="text-3xl sm:text-4xl mb-4">
+                  Por que escolher nossa plataforma?
+                </h2>
                 <p className="text-muted-foreground text-lg">
-                  Desenvolvida para facilitar a gestão educacional com eficiência e simplicidade
+                  Desenvolvida para facilitar a gestão educacional com
+                  eficiência e simplicidade
                 </p>
               </div>
               <div className="space-y-6">
@@ -168,7 +194,9 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
                     </div>
                     <div>
                       <h3 className="mb-2">{benefit.title}</h3>
-                      <p className="text-muted-foreground">{benefit.description}</p>
+                      <p className="text-muted-foreground">
+                        {benefit.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -183,9 +211,10 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         <div className="container mx-auto px-6 sm:px-8 lg:px-12 max-w-7xl text-center">
           <h2 className="text-3xl sm:text-4xl mb-4">Pronto para começar?</h2>
           <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-            Acesse agora e comece a gerenciar sua plataforma de estudos de forma eficiente
+            Acesse agora e comece a gerenciar sua plataforma de estudos de forma
+            eficiente
           </p>
-          <Link href={"/login"}>
+          <Link href={'/login'}>
             <Button size="lg" variant="default" onClick={onLogin}>
               Acessar Plataforma
             </Button>
@@ -200,5 +229,5 @@ export default function LandingPage({ onLogin }: LandingPageProps) {
         </div>
       </footer>
     </div>
-  );
+  )
 }

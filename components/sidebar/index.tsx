@@ -1,11 +1,5 @@
-import {
-  LayoutDashboard,
-  BookOpen,
-  Video,
-  Users,
-  FileText,
-  GraduationCap,
-} from 'lucide-react'
+import { LayoutDashboard, BookOpen, Video, Users, FileText } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -28,6 +22,7 @@ const menuItems = [
 
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname()
+  const isDashboardActive = pathname.startsWith('/dashboard')
 
   return (
     <>
@@ -44,25 +39,26 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         `}
       >
         <div className="flex flex-col h-full">
-          <div className="p-4 border-b border-border">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                <GraduationCap className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-semibold text-white">Proacad</span>
+          <div className="p-3 border-b border-muted-foreground">
+            <div className="flex items-center justify-center gap-2">
+              <Image src="/logosoftcom.svg" width={155} height={155} alt="" />
             </div>
           </div>
 
-          <nav className="flex-1 py-2 space-y-1">
+          <nav className="flex-1 py-6 px-4 space-y-1">
             <Link
-              href={'/dashboard'}
-              className={`w-full  flex items-center gap-3 px-3 py-2  transition-colors ${'text-muted-foreground hover:bg-muted-foreground hover:text-accent-foreground'}`}
+              href="/dashboard"
+              className={`w-full font-semibold hover:text-black flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
+                isDashboardActive
+                  ? ' text-black bg-muted'
+                  : 'text-white hover:bg-muted'
+              }`}
             >
-              <LayoutDashboard className="h-5 w-5 shrink-0 text-white ml-2" />
-              <span className="text-white ">Dashboard</span>
+              <LayoutDashboard className="h-4 w-4 shrink-0 ml-2" />
+              <span>Dashboard</span>
             </Link>
 
-            <h3 className="text-muted-foreground text-sm font-bold px-3 pt-3">
+            <h3 className="text-muted-foreground text-xs font-bold px-3 pt-3">
               CADASTROS
             </h3>
 
@@ -74,14 +70,14 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 <Link
                   href={item.href}
                   key={item.id}
-                  className={`w-full flex items-center gap-3 px-3 py-2  transition-colors ${
+                  className={`w-full font-semibold hover:text-black flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${
                     isActive
-                      ? ' text-white bg-muted-foreground'
-                      : 'text-muted-foreground hover:bg-muted-foreground hover:text-accent-foreground'
+                      ? ' text-black bg-muted'
+                      : 'text-white hover:bg-muted'
                   }`}
                 >
-                  <Icon className="h-5 w-5 shrink-0 text-white ml-2" />
-                  <span className="text-white ">{item.label}</span>
+                  <Icon className="h-4 w-4 shrink-0  ml-2 " />
+                  <span>{item.label}</span>
                 </Link>
               )
             })}

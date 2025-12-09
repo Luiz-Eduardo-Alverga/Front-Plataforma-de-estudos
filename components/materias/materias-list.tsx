@@ -1,7 +1,5 @@
 'use client'
 
-import { Plus, Edit, Trash2, MoreVertical } from 'lucide-react'
-import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import {
   Table,
@@ -11,37 +9,51 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu'
-import { MATERIAS_MOCK } from '@/utils/mock/mock-data'
-import { useRouter } from 'next/navigation'
-import { Dialog, DialogTrigger } from '../ui/dialog'
-import { MateriaDeleteDialog } from './materia-delete'
+
+import { ListHeader } from '../header/list-header'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getSubjects } from '@/services/subjects/get-subjects'
+import { AlertDialog } from '../ui/alert-dialog'
+import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
+import { DeleteEntityDialog } from '../modal/delet-entity'
+import { deleteSubject } from '@/services/subjects/delete-subject'
+import { Pagination } from '../pagination'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 export function MateriasList() {
+  const searchParams = useSearchParams()
+  const queryClient = useQueryClient()
   const router = useRouter()
+  const page = Number(searchParams.get('page') ?? '1')
+
+  const { data: response } = useQuery({
+    queryKey: ['subjects'],
+    queryFn: getSubjects,
+  })
+
+  const { mutateAsync: deleteSubjectFn, isPending } = useMutation({
+    mutationFn: deleteSubject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subjects'] })
+    },
+  })
+
+  function handlePaginate(newPage: number) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', String(newPage))
+
+    router.push(`?${params.toString()}`)
+  }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-          <h2>Gerenciar Matérias</h2>
-          <p className="text-muted-foreground">
-            Cadastre e gerencie as matérias da plataforma
-          </p>
-        </div>
-        <Button
-          className="w-full sm:w-auto"
-          onClick={() => router.push('/materias/novo')}
-        >
-          <Plus className="h-4 w-4" />
-          Nova Matéria
-        </Button>
-      </div>
+      <ListHeader
+        title="Matérias"
+        description="Cadastre e gerencie as matérias da plataforma"
+        newButtonLabel="Nova Matéria"
+        newButtonHref="materias"
+        hasData={true && true}
+      />
 
       <div className="mt-4 rounded-2xl border overflow-hidden">
         <Table>
@@ -55,68 +67,57 @@ export function MateriasList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {MATERIAS_MOCK.map((materia) => (
-              <TableRow key={materia.id}>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full shrink-0"
-                      style={{ backgroundColor: materia.cor }}
-                    />
-                    <div>
-                      <p className="font-medium">{materia.nome}</p>
-                      <p className="text-muted-foreground line-clamp-1">
-                        {materia.descricao}
-                      </p>
+            {response &&
+              response.data.map((subject) => (
+                <TableRow key={subject.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: subject.color }}
+                      />
+                      <div>
+                        <p className="font-medium">{subject.name}</p>
+                        <p className="text-muted-foreground line-clamp-1">
+                          {subject.description}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>{materia.professorNome}</TableCell>
-                <TableCell>{materia.cargaHoraria}h</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      materia.status === 'ativa' ? 'success' : 'secondary'
-                    }
-                  >
-                    {materia.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Dialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          className="text-emerald-500 focus:text-emerald-500"
-                          onClick={() =>
-                            router.push(`/materias/${materia.id}/editar`)
-                          }
-                        >
-                          <Edit className="h-4 w-4 mr-2 text-emerald-500" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DialogTrigger asChild>
-                          <DropdownMenuItem className="text-destructive focus:text-destructive">
-                            <Trash2 className="h-4 w-4 mr-2 text-destructive" />
-                            Excluir
-                          </DropdownMenuItem>
-                        </DialogTrigger>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                  </TableCell>
+                  <TableCell>{subject.teacher.name}</TableCell>
+                  <TableCell>{subject.workload_hours}h</TableCell>
+                  <TableCell>
+                    <Badge variant={subject.active ? 'success' : 'secondary'}>
+                      {subject.active ? 'ativo' : 'inativo'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <AlertDialog>
+                      <TableDropdwonMenu itemHref="materias" id={subject.id} />
 
-                    <MateriaDeleteDialog />
-                  </Dialog>
-                </TableCell>
-              </TableRow>
-            ))}
+                      <DeleteEntityDialog
+                        deleteFn={async (id) => {
+                          await deleteSubjectFn({ id })
+                        }}
+                        entityId={String(subject.id)}
+                        entityName="matéria"
+                        isLoading={isPending}
+                      />
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </div>
+
+      {response && response.meta.last_page > 1 && (
+        <Pagination
+          pageIndex={page}
+          pages={response.meta.last_page}
+          onPageChange={handlePaginate}
+        />
+      )}
     </div>
   )
 }

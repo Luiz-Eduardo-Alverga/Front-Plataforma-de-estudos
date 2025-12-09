@@ -6,6 +6,6 @@ export default async function ProfessorEditFormPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  
-  return <ProfessorForm mode="edit" />
+
+  return <ProfessorForm mode="edit" id={id} />
 }
