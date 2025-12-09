@@ -11,9 +11,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { PROFESSORES_MOCK } from '@/utils/mock/mock-data'
-import { ArrowLeft, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import z from 'zod'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Switch } from '../ui/switch'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getProfessores } from '@/services/professor/get-professores'
+import { FormButton } from '../button/form-button'
+import { FormHeader } from '../header/form-header'
+import { deleteSubject } from '@/services/subjects/delete-subject'
+import { createSubject } from '@/services/subjects/create-subject'
+
+const createSubjectSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  workloadHours: z.number(),
+  teacherId: z.string(),
+  active: z.boolean().nullable(),
+  color: z.string()
+})
+
+type CreateSubjectSchema = z.infer<typeof createSubjectSchema>
 
 interface MateriaPageProps {
   mode: 'create' | 'edit'
@@ -21,53 +40,46 @@ interface MateriaPageProps {
 
 export function MateriaForm({ mode }: MateriaPageProps) {
   const router = useRouter()
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Em produção, aqui faria a chamada para a API
-    console.log('Matéria salva')
-  }
+  const queryClient = useQueryClient()
+  const {register, handleSubmit, control} = useForm<CreateSubjectSchema>({
+    resolver: zodResolver(createSubjectSchema)
+  }) 
 
-  const title = mode === 'create' ? 'Nova Matéria' : 'Editar Matéria'
+  const { data: professores } = useQuery({
+    queryKey: ['professores'],
+    queryFn: () => getProfessores({page: 1})
+  })
+
+  const { mutateAsync: deleteSubjectFn } = useMutation({
+      mutationFn: deleteSubject,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['subjects'] })
+      },
+  })
+
+  const {mutateAsync, isPending} = useMutation({
+    mutationFn: createSubject
+  })
+
+  function handleCreateOrUpdateSubject (data: CreateSubjectSchema) {
+    console.log(data)
+  }
 
   return (
     <div className="space-y-6">
-      <div>
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-lg sm:text-2xl">{title}</h2>
-            <p className="text-muted-foreground text-sm sm:text-base">
-              Preencha os campos abaixo para{' '}
-              {mode === 'create' ? 'cadastrar' : 'atualizar'} a matéria
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => router.back()}
-              variant="outline"
-              className="shrink-0"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </Button>
-            {mode === 'edit' && (
-              <Button variant="destructive" className="shrink-0">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+
+      <FormHeader handleDelete={() => deleteSubjectFn} mode={mode} label='Nova' title="Matéria" description='a Matéria'/>
 
       <div>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(handleCreateOrUpdateSubject)}
           className="bg-card rounded-lg border p-4 sm:p-6"
         >
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome da Matéria</Label>
-                <Input id="nome" placeholder="Ex: Cálculo I" required />
+                <Input id="nome" placeholder="Ex: Cálculo I" {...register('name')} />
               </div>
 
               <div className="space-y-2">
@@ -76,7 +88,7 @@ export function MateriaForm({ mode }: MateriaPageProps) {
                   id="cargaHoraria"
                   type="number"
                   placeholder="Ex: 80"
-                  required
+                  {...register('workloadHours')}
                 />
               </div>
             </div>
@@ -88,21 +100,22 @@ export function MateriaForm({ mode }: MateriaPageProps) {
                 placeholder="Descrição da matéria"
                 rows={4}
                 required
+                {...register('description')}
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
+            <div className="grid grid-cols-7 gap-6">
+              <div className="space-y-2 col-span-3">
                 <Label htmlFor="professor">Professor</Label>
                 <Select required>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um professor" />
                   </SelectTrigger>
                   <SelectContent>
-                    {PROFESSORES_MOCK.filter((p) => p.status === 'ativo').map(
+                    {professores && professores.data.filter((p) => p.active).map(
                       (professor) => (
-                        <SelectItem key={professor.id} value={professor.id}>
-                          {professor.nome}
+                        <SelectItem key={professor.id} value={professor.name}>
+                          {professor.name}
                         </SelectItem>
                       ),
                     )}
@@ -110,39 +123,34 @@ export function MateriaForm({ mode }: MateriaPageProps) {
                 </Select>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-2 col-span-3">
                 <Label htmlFor="cor">Cor</Label>
-                <Input id="cor" type="color" required />
+                <Input id="cor" type="color" {...register('color')}/>
               </div>
+
+              <div className="flex gap-2 items-center col-span-2 sm:col-span-1 sm:mt-2 sm:ml-auto">
+              <Controller
+                name="active"
+                control={control}
+                render={({ field }) => (
+                  <Switch
+                    id="active"
+                    checked={field.value ?? true}
+                    onCheckedChange={field.onChange}
+                  />
+                )}
+              />
+              <Label htmlFor="active">Ativar</Label>
+            </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ativa">Ativa</SelectItem>
-                  <SelectItem value="inativa">Inativa</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            
           </div>
 
-          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-8">
-            <Button
-              onClick={() => router.back()}
-              type="button"
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" className="w-full sm:w-auto">
-              {mode === 'create' ? 'Cadastrar' : 'Salvar'}
-            </Button>
-          </div>
+          <FormButton 
+            mode={mode}
+            isSubmiting={isPending}
+          />
         </form>
       </div>
     </div>

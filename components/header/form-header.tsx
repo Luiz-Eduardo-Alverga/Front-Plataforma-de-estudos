@@ -7,6 +7,7 @@ interface FormHeaderProps {
   handleDelete: () => void
   title?: string
   description?: string
+  label: string
 }
 
 export function FormHeader({
@@ -14,24 +15,23 @@ export function FormHeader({
   mode,
   title,
   description,
+  label
 }: FormHeaderProps) {
   const router = useRouter()
 
-  const defaultTitle = mode === 'create' ? 'Novo Professor' : 'Editar Professor'
+  const defaultTitle = mode === 'create' ? `${label} ${title}` : `Editar ${title}`
 
   const defaultDescription = `Preencha os campos abaixo para ${
     mode === 'create' ? 'cadastrar' : 'atualizar'
-  } o professor`
+  } ${description}`
 
-  const finalTitle = title ?? defaultTitle
-  const finalDescription = description ?? defaultDescription
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
       <div>
-        <h2 className="text-lg sm:text-2xl">{finalTitle}</h2>
+        <h2 className="text-lg sm:text-2xl">{defaultTitle}</h2>
         <p className="text-muted-foreground text-sm sm:text-base">
-          {finalDescription}
+          {defaultDescription}
         </p>
       </div>
       <div className="flex items-center gap-2">

@@ -18,3 +18,12 @@ export interface SubjectResponse {
   links: PaginationLinks
   meta: PaginationMeta
 }
+
+export interface CreateSubject {
+  name: string
+  workload_hours: number
+  description: string
+  teacher_id: string
+  color: string
+  active: 0 | 1
+}
