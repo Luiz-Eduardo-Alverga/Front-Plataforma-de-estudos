@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
@@ -11,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { useRouter } from 'next/navigation'
 import z from 'zod'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,7 +19,8 @@ import { getProfessores } from '@/services/professor/get-professores'
 import { FormButton } from '../button/form-button'
 import { FormHeader } from '../header/form-header'
 import { deleteSubject } from '@/services/subjects/delete-subject'
-import { createSubject } from '@/services/subjects/create-subject'
+import { Professor } from '@/interfaces/professor'
+// import { createSubject } from '@/services/subjects/create-subject'
 
 const createSubjectSchema = z.object({
   name: z.string(),
@@ -29,7 +28,7 @@ const createSubjectSchema = z.object({
   workloadHours: z.number(),
   teacherId: z.string(),
   active: z.boolean().nullable(),
-  color: z.string()
+  color: z.string(),
 })
 
 type CreateSubjectSchema = z.infer<typeof createSubjectSchema>
@@ -39,36 +38,40 @@ interface MateriaPageProps {
 }
 
 export function MateriaForm({ mode }: MateriaPageProps) {
-  const router = useRouter()
   const queryClient = useQueryClient()
-  const {register, handleSubmit, control} = useForm<CreateSubjectSchema>({
-    resolver: zodResolver(createSubjectSchema)
-  }) 
+  const { register, handleSubmit, control } = useForm<CreateSubjectSchema>({
+    resolver: zodResolver(createSubjectSchema),
+  })
 
   const { data: professores } = useQuery({
     queryKey: ['professores'],
-    queryFn: () => getProfessores({page: 1})
+    queryFn: () => getProfessores({ page: 1 }),
   })
 
   const { mutateAsync: deleteSubjectFn } = useMutation({
-      mutationFn: deleteSubject,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['subjects'] })
-      },
+    mutationFn: deleteSubject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subjects'] })
+    },
   })
 
-  const {mutateAsync, isPending} = useMutation({
-    mutationFn: createSubject
-  })
+  // const { mutateAsync, isPending } = useMutation({
+  //   mutationFn: createSubject,
+  // })
 
-  function handleCreateOrUpdateSubject (data: CreateSubjectSchema) {
+  function handleCreateOrUpdateSubject(data: CreateSubjectSchema) {
     console.log(data)
   }
 
   return (
     <div className="space-y-6">
-
-      <FormHeader handleDelete={() => deleteSubjectFn} mode={mode} label='Nova' title="Matéria" description='a Matéria'/>
+      <FormHeader
+        handleDelete={() => deleteSubjectFn}
+        mode={mode}
+        label="Nova"
+        title="Matéria"
+        description="a Matéria"
+      />
 
       <div>
         <form
@@ -79,7 +82,11 @@ export function MateriaForm({ mode }: MateriaPageProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome da Matéria</Label>
-                <Input id="nome" placeholder="Ex: Cálculo I" {...register('name')} />
+                <Input
+                  id="nome"
+                  placeholder="Ex: Cálculo I"
+                  {...register('name')}
+                />
               </div>
 
               <div className="space-y-2">
@@ -112,45 +119,41 @@ export function MateriaForm({ mode }: MateriaPageProps) {
                     <SelectValue placeholder="Selecione um professor" />
                   </SelectTrigger>
                   <SelectContent>
-                    {professores && professores.data.filter((p) => p.active).map(
-                      (professor) => (
-                        <SelectItem key={professor.id} value={professor.name}>
-                          {professor.name}
-                        </SelectItem>
-                      ),
-                    )}
+                    {professores &&
+                      professores.data
+                        .filter((p: Professor) => p.active)
+                        .map((professor) => (
+                          <SelectItem key={professor.id} value={professor.name}>
+                            {professor.name}
+                          </SelectItem>
+                        ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2 col-span-3">
                 <Label htmlFor="cor">Cor</Label>
-                <Input id="cor" type="color" {...register('color')}/>
+                <Input id="cor" type="color" {...register('color')} />
               </div>
 
               <div className="flex gap-2 items-center col-span-2 sm:col-span-1 sm:mt-2 sm:ml-auto">
-              <Controller
-                name="active"
-                control={control}
-                render={({ field }) => (
-                  <Switch
-                    id="active"
-                    checked={field.value ?? true}
-                    onCheckedChange={field.onChange}
-                  />
-                )}
-              />
-              <Label htmlFor="active">Ativar</Label>
+                <Controller
+                  name="active"
+                  control={control}
+                  render={({ field }) => (
+                    <Switch
+                      id="active"
+                      checked={field.value ?? true}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
+                <Label htmlFor="active">Ativar</Label>
+              </div>
             </div>
-            </div>
-
-            
           </div>
 
-          <FormButton 
-            mode={mode}
-            isSubmiting={isPending}
-          />
+          <FormButton mode={mode} isSubmiting />
         </form>
       </div>
     </div>
