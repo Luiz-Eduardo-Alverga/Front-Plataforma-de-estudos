@@ -73,13 +73,13 @@ export function ProfessoresList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {response.data.map((professor) => (
-                <TableRow key={professor.id}>
+              {response.data.map((response) => (
+                <TableRow key={response.id}>
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                         <span className="font-medium text-primary">
-                          {professor.name
+                          {response.name
                             .split(' ')
                             .map((n) => n[0])
                             .join('')
@@ -87,42 +87,42 @@ export function ProfessoresList() {
                         </span>
                       </div>
                       <div>
-                        <p className="font-medium">{professor.name}</p>
+                        <p className="font-medium">{response.name}</p>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>{professor.speciality}</TableCell>
+                  <TableCell>{response.speciality}</TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-1">
                       <span className="flex items-center gap-1">
                         <Mail className="h-3 w-3" />
-                        {professor.email || 'Não informado'}
+                        {response.email || 'Não informado'}
                       </span>
                       <span className="flex items-center gap-1">
                         <Phone className="h-3 w-3" />
-                        {professor.phone || 'Não informado'}
+                        {response.phone || 'Não informado'}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={professor.active === 1 ? 'success' : 'secondary'}
+                      variant={response.active === 1 ? 'success' : 'secondary'}
                     >
-                      {professor.active === 1 ? 'ativo' : 'inativo'}
+                      {response.active === 1 ? 'ativo' : 'inativo'}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <AlertDialog>
                       <TableDropdwonMenu
                         itemHref="professores"
-                        id={professor.id}
+                        id={response.id}
                       />
 
                       <DeleteEntityDialog
                         deleteFn={async (id) => {
                           await deleteProfessorFn({ id })
                         }}
-                        entityId={String(professor.id)}
+                        entityId={String(response.id)}
                         entityName="professor"
                         isLoading={isPending}
                       />
