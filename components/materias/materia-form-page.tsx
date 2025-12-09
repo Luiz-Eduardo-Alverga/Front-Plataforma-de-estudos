@@ -1,5 +1,6 @@
 'use client'
 
+import { Professor } from '@/interfaces/professor'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
@@ -19,7 +20,6 @@ import { getProfessores } from '@/services/professor/get-professores'
 import { FormButton } from '../button/form-button'
 import { FormHeader } from '../header/form-header'
 import { deleteSubject } from '@/services/subjects/delete-subject'
-import { Professor } from '../../interfaces/professor'
 // import { createSubject } from '@/services/subjects/create-subject'
 
 const createSubjectSchema = z.object({
