@@ -1,4 +1,4 @@
-import { UpdateProfessorProps } from '@/interfaces/Professor'
+import { UpdateProfessorProps } from '@/interfaces/professor'
 import api from '@/lib/axios'
 
 export async function updateProfessor({

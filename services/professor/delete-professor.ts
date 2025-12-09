@@ -1,11 +1,11 @@
-import api from "@/lib/axios";
+import api from '@/lib/axios'
 
 interface deleteProfessorParams {
-    id: string;
+  id: string
 }
 
-export async function deleteProfessor({id}: deleteProfessorParams) {
-    const response = await api.delete(`teachers/${id}`);
+export async function deleteProfessor({ id }: deleteProfessorParams) {
+  const response = await api.delete(`teachers/${id}`)
 
-    return response.data;
+  return response.data
 }
