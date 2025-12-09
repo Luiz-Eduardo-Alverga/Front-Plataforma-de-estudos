@@ -19,7 +19,7 @@ import { getProfessores } from '@/services/professor/get-professores'
 import { FormButton } from '../button/form-button'
 import { FormHeader } from '../header/form-header'
 import { deleteSubject } from '@/services/subjects/delete-subject'
-import { Professor } from '@/interfaces/professor'
+import { Professor } from '../../interfaces/professor'
 // import { createSubject } from '@/services/subjects/create-subject'
 
 const createSubjectSchema = z.object({
