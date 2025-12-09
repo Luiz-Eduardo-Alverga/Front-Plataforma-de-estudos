@@ -1,6 +1,5 @@
 'use client'
 
-import { Professor } from '@/interfaces/professor'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
@@ -16,10 +15,11 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Switch } from '../ui/switch'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getProfessores } from '@/services/professor/get-professores'
+import { getProfessores } from '@/services/teacher/get-professores'
 import { FormButton } from '../button/form-button'
 import { FormHeader } from '../header/form-header'
 import { deleteSubject } from '@/services/subjects/delete-subject'
+import { Professor } from '@/interfaces/taecher'
 // import { createSubject } from '@/services/subjects/create-subject'
 
 const createSubjectSchema = z.object({

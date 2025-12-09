@@ -1,4 +1,4 @@
-import { Professor } from '@/interfaces/professor'
+import { Professor } from '@/interfaces/taecher'
 import api from '@/lib/axios'
 
 interface GetProfessorParams {

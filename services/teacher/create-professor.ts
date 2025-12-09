@@ -1,4 +1,4 @@
-import { CreateProfessorProps } from '@/interfaces/professor'
+import { CreateProfessorProps } from '@/interfaces/taecher'
 import api from '@/lib/axios'
 
 export async function createProfessor({

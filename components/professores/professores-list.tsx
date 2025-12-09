@@ -14,12 +14,12 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AlertDialog } from '../ui/alert-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getProfessores } from '@/services/professor/get-professores'
+import { getProfessores } from '@/services/teacher/get-professores'
 import { ProfessorsEmptyState } from './professor-empty-state'
 import { Pagination } from '../pagination'
 import { ListHeader } from '../header/list-header'
 import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
-import { deleteProfessor } from '@/services/professor/delete-professor'
+import { deleteProfessor } from '@/services/teacher/delete-professor'
 import { DeleteEntityDialog } from '../modal/delet-entity'
 
 export function ProfessoresList() {
