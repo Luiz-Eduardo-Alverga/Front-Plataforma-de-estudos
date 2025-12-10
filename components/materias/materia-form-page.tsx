@@ -20,12 +20,14 @@ import { FormButton } from '../button/form-button'
 import { FormHeader } from '../header/form-header'
 import { deleteSubject } from '@/services/subjects/delete-subject'
 import { Professor } from '@/interfaces/taecher'
-// import { createSubject } from '@/services/subjects/create-subject'
+import { createSubject } from '@/services/subjects/create-subject'
+import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 
 const createSubjectSchema = z.object({
   name: z.string(),
   description: z.string(),
-  workloadHours: z.number(),
+  workloadHours: z.string(),
   teacherId: z.string(),
   active: z.boolean().nullable(),
   color: z.string(),
@@ -38,9 +40,13 @@ interface MateriaPageProps {
 }
 
 export function MateriaForm({ mode }: MateriaPageProps) {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const { register, handleSubmit, control } = useForm<CreateSubjectSchema>({
     resolver: zodResolver(createSubjectSchema),
+    defaultValues: {
+      active: true,
+    },
   })
 
   const { data: professores } = useQuery({
@@ -50,16 +56,31 @@ export function MateriaForm({ mode }: MateriaPageProps) {
 
   const { mutateAsync: deleteSubjectFn } = useMutation({
     mutationFn: deleteSubject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subjects'] })
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subjects'] }),
   })
 
-  // const { mutateAsync, isPending } = useMutation({
-  //   mutationFn: createSubject,
-  // })
+  const { mutateAsync: createSubjectFn, isPending } = useMutation({
+    mutationFn: createSubject,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subjects'] }),
+  })
 
-  function handleCreateOrUpdateSubject(data: CreateSubjectSchema) {
+  async function handleCreateOrUpdateSubject(data: CreateSubjectSchema) {
+    const active = data ? 1 : 0
+
+    try {
+      await createSubjectFn({
+        name: data.name,
+        description: data.description,
+        color: data.color,
+        active,
+        teacher_id: data.teacherId,
+        workload_hours: Number(data.workloadHours),
+      })
+      router.back()
+      toast.success('Matéria cadastrada com sucesso')
+    } catch (error) {
+      console.log(error)
+    }
     console.log(data)
   }
 
@@ -106,7 +127,6 @@ export function MateriaForm({ mode }: MateriaPageProps) {
                 id="descricao"
                 placeholder="Descrição da matéria"
                 rows={4}
-                required
                 {...register('description')}
               />
             </div>
@@ -114,21 +134,30 @@ export function MateriaForm({ mode }: MateriaPageProps) {
             <div className="grid grid-cols-7 gap-6">
               <div className="space-y-2 col-span-3">
                 <Label htmlFor="professor">Professor</Label>
-                <Select required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um professor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {professores &&
-                      professores.data
-                        .filter((p: Professor) => p.active)
-                        .map((professor) => (
-                          <SelectItem key={professor.id} value={professor.name}>
-                            {professor.name}
-                          </SelectItem>
-                        ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="teacherId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um professor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {professores &&
+                          professores.data
+                            .filter((p: Professor) => p.active)
+                            .map((professor) => (
+                              <SelectItem
+                                key={professor.id}
+                                value={String(professor.id)}
+                              >
+                                {professor.name}
+                              </SelectItem>
+                            ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="space-y-2 col-span-3">
@@ -153,7 +182,7 @@ export function MateriaForm({ mode }: MateriaPageProps) {
             </div>
           </div>
 
-          <FormButton mode={mode} isSubmiting />
+          <FormButton mode={mode} isSubmiting={isPending} />
         </form>
       </div>
     </div>

@@ -15,12 +15,13 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { AlertDialog } from '../ui/alert-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getProfessores } from '@/services/teacher/get-professores'
-import { ProfessorsEmptyState } from './professor-empty-state'
+import EmptyStateImage from '@/public/undraw_professor_d7zn.svg'
 import { Pagination } from '../pagination'
 import { ListHeader } from '../header/list-header'
 import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
 import { deleteProfessor } from '@/services/teacher/delete-professor'
 import { DeleteEntityDialog } from '../modal/delet-entity'
+import { EmptyState } from '../empty-state'
 
 export function ProfessoresList() {
   const searchParams = useSearchParams()
@@ -58,7 +59,16 @@ export function ProfessoresList() {
         hasData={!!response && response.data.length > 0}
       />
 
-      {!response || (response.data.length === 0 && <ProfessorsEmptyState />)}
+      {!response ||
+        (response.data.length === 0 && (
+          <EmptyState
+            title="Nenhum professor cadastrado"
+            description="Comece adicionando professores à plataforma para gerenciar suas
+          especialidades e disciplinas."
+            footerText="Adicionar Primeiro Professor"
+            image={EmptyStateImage}
+          />
+        ))}
 
       {response && response.data.length > 0 && (
         <div className="mt-4 rounded-lg border overflow-hidden shadow">

@@ -19,6 +19,8 @@ import { DeleteEntityDialog } from '../modal/delet-entity'
 import { deleteSubject } from '@/services/subjects/delete-subject'
 import { Pagination } from '../pagination'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { EmptyState } from '../empty-state'
+import EmptyStateImage from '@/public/undraw_teaching_58yg.svg'
 
 export function MateriasList() {
   const searchParams = useSearchParams()
@@ -55,61 +57,76 @@ export function MateriasList() {
         hasData={true && true}
       />
 
-      <div className="mt-4 rounded-2xl border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Matéria</TableHead>
-              <TableHead>Professor</TableHead>
-              <TableHead>Carga Horária</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {response &&
-              response.data.map((subject) => (
-                <TableRow key={subject.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full shrink-0"
-                        style={{ backgroundColor: subject.color }}
-                      />
-                      <div>
-                        <p className="font-medium">{subject.name}</p>
-                        <p className="text-muted-foreground line-clamp-1">
-                          {subject.description}
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{subject.teacher.name}</TableCell>
-                  <TableCell>{subject.workload_hours}h</TableCell>
-                  <TableCell>
-                    <Badge variant={subject.active ? 'success' : 'secondary'}>
-                      {subject.active ? 'ativo' : 'inativo'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <AlertDialog>
-                      <TableDropdwonMenu itemHref="materias" id={subject.id} />
+      {!response ||
+        (response.data.length === 0 && (
+          <EmptyState
+            title="Nenhuma matéria cadastrada"
+            description="Comece adicionando matérias à plataforma para gerenciar os horários das suas aulas"
+            footerText="Adicionar Primeira Matéria"
+            image={EmptyStateImage}
+          />
+        ))}
 
-                      <DeleteEntityDialog
-                        deleteFn={async (id) => {
-                          await deleteSubjectFn({ id })
-                        }}
-                        entityId={String(subject.id)}
-                        entityName="matéria"
-                        isLoading={isPending}
-                      />
-                    </AlertDialog>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </div>
+      {response && response.data.length > 0 && (
+        <div className="mt-4 rounded-2xl border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Matéria</TableHead>
+                <TableHead>Professor</TableHead>
+                <TableHead>Carga Horária</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-[70px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {response &&
+                response.data.map((subject) => (
+                  <TableRow key={subject.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full shrink-0"
+                          style={{ backgroundColor: subject.color }}
+                        />
+                        <div>
+                          <p className="font-medium">{subject.name}</p>
+                          <p className="text-muted-foreground line-clamp-1">
+                            {subject.description}
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>{subject.teacher.name}</TableCell>
+                    <TableCell>{subject.workload_hours}h</TableCell>
+                    <TableCell>
+                      <Badge variant={subject.active ? 'success' : 'secondary'}>
+                        {subject.active ? 'ativo' : 'inativo'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <AlertDialog>
+                        <TableDropdwonMenu
+                          itemHref="materias"
+                          id={subject.id}
+                        />
+
+                        <DeleteEntityDialog
+                          deleteFn={async (id) => {
+                            await deleteSubjectFn({ id })
+                          }}
+                          entityId={String(subject.id)}
+                          entityName="matéria"
+                          isLoading={isPending}
+                        />
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       {response && response.meta.last_page > 1 && (
         <Pagination
