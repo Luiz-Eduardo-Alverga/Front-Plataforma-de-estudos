@@ -84,7 +84,7 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
   const isSubmittingProfessor =
     mode === 'create' ? isCreatingProfessor : isUpdatingProfessor
 
-  const { mutateAsync: deleteProfessorFn } = useMutation({
+  const { mutateAsync: deleteProfessorFn, isPending } = useMutation({
     mutationFn: (id: string) => deleteProfessor({ id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['professores'] })
@@ -148,7 +148,7 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
 
   return (
     <div className="space-y-6">
-      <FormHeader mode={mode} handleDelete={handleDeleteProfessor} label='Novo' title='Professor' description='o professor' />
+      <FormHeader isPending={isPending} entityId={id} mode={mode} handleDelete={handleDeleteProfessor} label='Novo' title='Professor' description='o professor' />
 
       <form
         onSubmit={handleSubmit(handleCreateOrUpdateProfessor)}

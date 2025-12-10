@@ -87,6 +87,8 @@ export function MateriaForm({ mode }: MateriaPageProps) {
   return (
     <div className="space-y-6">
       <FormHeader
+        isPending
+        entityId=''
         handleDelete={() => deleteSubjectFn}
         mode={mode}
         label="Nova"

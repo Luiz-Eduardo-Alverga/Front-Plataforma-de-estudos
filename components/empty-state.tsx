@@ -9,6 +9,7 @@ interface EmptyStateProps {
   description: string
   footerText: string
   image: string
+  href: string
 }
 
 export function EmptyState({
@@ -16,6 +17,7 @@ export function EmptyState({
   footerText,
   image,
   title,
+  href
 }: EmptyStateProps) {
   const router = useRouter()
 
@@ -36,7 +38,7 @@ export function EmptyState({
           {description}
         </p>
 
-        <Button onClick={() => router.push('/professores/novo')}>
+        <Button onClick={() => router.push(`/${href}/novo`)}>
           <Plus className="h-4 w-4" />
           {footerText}
         </Button>

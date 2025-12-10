@@ -67,6 +67,7 @@ export function ProfessoresList() {
           especialidades e disciplinas."
             footerText="Adicionar Primeiro Professor"
             image={EmptyStateImage}
+            href='professores'
           />
         ))}
 

@@ -64,6 +64,7 @@ export function MateriasList() {
             description="Comece adicionando matérias à plataforma para gerenciar os horários das suas aulas"
             footerText="Adicionar Primeira Matéria"
             image={EmptyStateImage}
+            href='materias'
           />
         ))}
 

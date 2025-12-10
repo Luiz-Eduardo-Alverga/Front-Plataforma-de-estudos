@@ -1,6 +1,8 @@
 import { ArrowLeft, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useRouter } from 'next/navigation'
+import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
+import { DeleteEntityDialog } from '../modal/delet-entity'
 
 interface FormHeaderProps {
   mode: 'create' | 'edit'
@@ -8,6 +10,8 @@ interface FormHeaderProps {
   title?: string
   description?: string
   label: string
+  entityId: string
+  isPending: boolean
 }
 
 export function FormHeader({
@@ -15,7 +19,9 @@ export function FormHeader({
   mode,
   title,
   description,
-  label
+  label,
+  entityId,
+  isPending
 }: FormHeaderProps) {
   const router = useRouter()
 
@@ -43,14 +49,25 @@ export function FormHeader({
           Voltar
         </Button>
 
-        {mode === 'edit' && (
-          <Button
-            onClick={handleDelete}
-            className="shrink-0 bg-destructive hover:bg-destructive/90"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
+        <AlertDialog>
+
+          <AlertDialogTrigger asChild>
+            {mode === 'edit' && (
+              <Button
+                className="shrink-0 bg-destructive hover:bg-destructive/90"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </AlertDialogTrigger>
+
+          <DeleteEntityDialog
+            deleteFn={handleDelete}
+            entityId={entityId}
+            entityName="matéria"
+            isLoading={isPending}
+          />
+        </AlertDialog>
       </div>
     </div>
   )
