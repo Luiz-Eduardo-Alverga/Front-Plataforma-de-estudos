@@ -15,14 +15,16 @@ import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Switch } from '../ui/switch'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getProfessores } from '@/services/teacher/get-professores'
 import { FormButton } from '../button/form-button'
 import { FormHeader } from '../header/form-header'
-import { deleteSubject } from '@/services/subjects/delete-subject'
 import { Professor } from '@/interfaces/taecher'
 import { createSubject } from '@/services/subjects/create-subject'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
+import { getSubject } from '@/services/subjects/get-subject'
+import { useEffect } from 'react'
+import { useDeleteSubject } from '@/hooks/subjects/use-delete-subject'
+import { useTeachers } from '@/hooks/teachers/use-get-teachers'
 
 const createSubjectSchema = z.object({
   name: z.string(),
@@ -36,28 +38,48 @@ const createSubjectSchema = z.object({
 type CreateSubjectSchema = z.infer<typeof createSubjectSchema>
 
 interface MateriaPageProps {
+  id: string
   mode: 'create' | 'edit'
 }
 
-export function MateriaForm({ mode }: MateriaPageProps) {
+export function MateriaForm({ mode, id }: MateriaPageProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { register, handleSubmit, control } = useForm<CreateSubjectSchema>({
-    resolver: zodResolver(createSubjectSchema),
-    defaultValues: {
-      active: true,
-    },
+  const { register, handleSubmit, control, setValue } =
+    useForm<CreateSubjectSchema>({
+      resolver: zodResolver(createSubjectSchema),
+      defaultValues: {
+        active: true,
+      },
+    })
+
+  const { data: teachers, isPending: isLoadingTeacher } = useTeachers()
+
+  const { data: subject } = useQuery({
+    queryKey: ['subject', id],
+    queryFn: () => getSubject({ subjectId: id }),
+    enabled: mode === 'edit',
   })
 
-  const { data: professores } = useQuery({
-    queryKey: ['professores'],
-    queryFn: () => getProfessores({ page: 1 }),
-  })
+  useEffect(() => {
+    if (mode === 'edit' && subject) {
+      setValue('name', subject.name)
+      setValue('description', subject.description)
+      setValue('workloadHours', String(subject.workload_hours))
+      setValue('color', subject.color)
+      setValue('active', subject.active === 1)
 
-  const { mutateAsync: deleteSubjectFn } = useMutation({
-    mutationFn: deleteSubject,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subjects'] }),
-  })
+      const teacherId = String(subject.teacher.id)
+
+      const timeout = setTimeout(() => {
+        setValue('teacherId', teacherId)
+      }, 0)
+
+      return () => clearTimeout(timeout)
+    }
+  }, [subject, mode, setValue])
+
+  const { mutateAsync: deleteSubjectFn } = useDeleteSubject()
 
   const { mutateAsync: createSubjectFn, isPending } = useMutation({
     mutationFn: createSubject,
@@ -65,7 +87,7 @@ export function MateriaForm({ mode }: MateriaPageProps) {
   })
 
   async function handleCreateOrUpdateSubject(data: CreateSubjectSchema) {
-    const active = data ? 1 : 0
+    const active = data.active ? 1 : 0
 
     try {
       await createSubjectFn({
@@ -81,14 +103,13 @@ export function MateriaForm({ mode }: MateriaPageProps) {
     } catch (error) {
       console.log(error)
     }
-    console.log(data)
   }
 
   return (
     <div className="space-y-6">
       <FormHeader
         isPending
-        entityId=''
+        entityId=""
         handleDelete={() => deleteSubjectFn}
         mode={mode}
         label="Nova"
@@ -140,13 +161,21 @@ export function MateriaForm({ mode }: MateriaPageProps) {
                   name="teacherId"
                   control={control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || undefined}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione um professor" />
                       </SelectTrigger>
                       <SelectContent>
-                        {professores &&
-                          professores.data
+                        {isLoadingTeacher ? (
+                          <SelectItem value="carregando">
+                            Carregando...
+                          </SelectItem>
+                        ) : (
+                          teachers &&
+                          teachers.data
                             .filter((p: Professor) => p.active)
                             .map((professor) => (
                               <SelectItem
@@ -155,7 +184,8 @@ export function MateriaForm({ mode }: MateriaPageProps) {
                               >
                                 {professor.name}
                               </SelectItem>
-                            ))}
+                            ))
+                        )}
                       </SelectContent>
                     </Select>
                   )}

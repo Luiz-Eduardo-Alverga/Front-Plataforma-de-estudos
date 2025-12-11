@@ -13,34 +13,23 @@ import {
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AlertDialog } from '../ui/alert-dialog'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getProfessores } from '@/services/teacher/get-professores'
 import EmptyStateImage from '@/public/undraw_professor_d7zn.svg'
 import { Pagination } from '../pagination'
 import { ListHeader } from '../header/list-header'
 import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
-import { deleteProfessor } from '@/services/teacher/delete-professor'
+
 import { DeleteEntityDialog } from '../modal/delet-entity'
 import { EmptyState } from '../empty-state'
+import { useDeleteTeacher } from '@/hooks/teachers/use-delete-teacher'
+import { useTeachers } from '@/hooks/teachers/use-get-teachers'
 
 export function ProfessoresList() {
   const searchParams = useSearchParams()
-  const router = useRouter()
-  const queryClient = useQueryClient()
-
   const page = Number(searchParams.get('page') ?? '1')
+  const router = useRouter()
+  const { data: response } = useTeachers()
 
-  const { data: response } = useQuery({
-    queryKey: ['professores', page],
-    queryFn: () => getProfessores({ page }),
-  })
-
-  const { mutateAsync: deleteProfessorFn, isPending } = useMutation({
-    mutationFn: deleteProfessor,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['professores'] })
-    },
-  })
+  const { mutateAsync: deleteProfessorFn, isPending } = useDeleteTeacher()
 
   function handlePaginate(newPage: number) {
     const params = new URLSearchParams(searchParams.toString())
@@ -67,7 +56,7 @@ export function ProfessoresList() {
           especialidades e disciplinas."
             footerText="Adicionar Primeiro Professor"
             image={EmptyStateImage}
-            href='professores'
+            href="professores"
           />
         ))}
 

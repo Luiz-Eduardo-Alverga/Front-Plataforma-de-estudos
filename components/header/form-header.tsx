@@ -21,16 +21,16 @@ export function FormHeader({
   description,
   label,
   entityId,
-  isPending
+  isPending,
 }: FormHeaderProps) {
   const router = useRouter()
 
-  const defaultTitle = mode === 'create' ? `${label} ${title}` : `Editar ${title}`
+  const defaultTitle =
+    mode === 'create' ? `${label} ${title}` : `Editar ${title}`
 
   const defaultDescription = `Preencha os campos abaixo para ${
     mode === 'create' ? 'cadastrar' : 'atualizar'
   } ${description}`
-
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -50,12 +50,9 @@ export function FormHeader({
         </Button>
 
         <AlertDialog>
-
           <AlertDialogTrigger asChild>
             {mode === 'edit' && (
-              <Button
-                className="shrink-0 bg-destructive hover:bg-destructive/90"
-              >
+              <Button className="shrink-0 bg-destructive hover:bg-destructive/90">
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}

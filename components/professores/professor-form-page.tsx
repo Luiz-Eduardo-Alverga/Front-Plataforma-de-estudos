@@ -13,7 +13,7 @@ import toast from 'react-hot-toast'
 import { getProfessor } from '@/services/teacher/get-professor'
 import { useEffect } from 'react'
 import { updateProfessor } from '@/services/teacher/update-professor'
-import { deleteProfessor } from '@/services/teacher/delete-professor'
+import { deleteTeacher } from '@/services/teacher/delete-professor'
 import { FormHeader } from '../header/form-header'
 import { FormButton } from '../button/form-button'
 
@@ -61,7 +61,7 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
       setValue('name', professor.name)
       setValue('email', professor.email)
       setValue('phone', professor.phone)
-      setValue('speciality', professor.speciality || '')
+      setValue('speciality', professor.speciality)
       setValue(
         'admissionDate',
         professor.admissionDate
@@ -85,7 +85,7 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
     mode === 'create' ? isCreatingProfessor : isUpdatingProfessor
 
   const { mutateAsync: deleteProfessorFn, isPending } = useMutation({
-    mutationFn: (id: string) => deleteProfessor({ id }),
+    mutationFn: (id: string) => deleteTeacher({ id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['professores'] })
     },
@@ -148,7 +148,15 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
 
   return (
     <div className="space-y-6">
-      <FormHeader isPending={isPending} entityId={id} mode={mode} handleDelete={handleDeleteProfessor} label='Novo' title='Professor' description='o professor' />
+      <FormHeader
+        isPending={isPending}
+        entityId={id}
+        mode={mode}
+        handleDelete={handleDeleteProfessor}
+        label="Novo"
+        title="Professor"
+        description="o professor"
+      />
 
       <form
         onSubmit={handleSubmit(handleCreateOrUpdateProfessor)}

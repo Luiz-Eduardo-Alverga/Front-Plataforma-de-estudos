@@ -11,20 +11,19 @@ import {
 } from '../ui/table'
 
 import { ListHeader } from '../header/list-header'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getSubjects } from '@/services/subjects/get-subjects'
 import { AlertDialog } from '../ui/alert-dialog'
 import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
 import { DeleteEntityDialog } from '../modal/delet-entity'
-import { deleteSubject } from '@/services/subjects/delete-subject'
 import { Pagination } from '../pagination'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { EmptyState } from '../empty-state'
 import EmptyStateImage from '@/public/undraw_teaching_58yg.svg'
+import { useDeleteSubject } from '@/hooks/subjects/use-delete-subject'
 
 export function MateriasList() {
   const searchParams = useSearchParams()
-  const queryClient = useQueryClient()
   const router = useRouter()
   const page = Number(searchParams.get('page') ?? '1')
 
@@ -33,12 +32,7 @@ export function MateriasList() {
     queryFn: getSubjects,
   })
 
-  const { mutateAsync: deleteSubjectFn, isPending } = useMutation({
-    mutationFn: deleteSubject,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subjects'] })
-    },
-  })
+  const { mutateAsync: deleteSubjectFn, isPending } = useDeleteSubject()
 
   function handlePaginate(newPage: number) {
     const params = new URLSearchParams(searchParams.toString())
@@ -54,7 +48,7 @@ export function MateriasList() {
         description="Cadastre e gerencie as matérias da plataforma"
         newButtonLabel="Nova Matéria"
         newButtonHref="materias"
-        hasData={true && true}
+        hasData={!!response && response.data.length > 0}
       />
 
       {!response ||
@@ -64,7 +58,7 @@ export function MateriasList() {
             description="Comece adicionando matérias à plataforma para gerenciar os horários das suas aulas"
             footerText="Adicionar Primeira Matéria"
             image={EmptyStateImage}
-            href='materias'
+            href="materias"
           />
         ))}
 
