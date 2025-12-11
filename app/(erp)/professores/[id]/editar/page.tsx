@@ -1,4 +1,4 @@
-import { ProfessorForm } from '@/components/professores/professor-form-page'
+import { TeacherForm } from '@/components/professores/professor-form-page'
 
 export default async function ProfessorEditFormPage({
   params,
@@ -7,5 +7,5 @@ export default async function ProfessorEditFormPage({
 }) {
   const { id } = await params
 
-  return <ProfessorForm mode="edit" id={id} />
+  return <TeacherForm mode="edit" id={id} />
 }

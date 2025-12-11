@@ -6,7 +6,7 @@ import { DeleteEntityDialog } from '../modal/delet-entity'
 
 interface FormHeaderProps {
   mode: 'create' | 'edit'
-  handleDelete: () => void
+  handleDelete: (id: string) => Promise<void> | void
   title?: string
   description?: string
   label: string

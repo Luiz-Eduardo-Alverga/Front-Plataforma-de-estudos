@@ -27,8 +27,8 @@ export function ProfessoresList() {
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page') ?? '1')
   const router = useRouter()
-  const { data: response } = useTeachers()
 
+  const { data: response } = useTeachers()
   const { mutateAsync: deleteProfessorFn, isPending } = useDeleteTeacher()
 
   function handlePaginate(newPage: number) {
