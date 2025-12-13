@@ -27,3 +27,8 @@ export interface CreateSubject {
   color: string
   active: 0 | 1
 }
+
+export interface UpdateSubject {
+  subjectId: string
+  subjectData: CreateSubject
+}

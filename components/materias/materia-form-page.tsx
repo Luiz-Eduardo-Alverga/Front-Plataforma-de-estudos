@@ -54,6 +54,7 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
     })
 
   const { data: teachers, isPending: isLoadingTeacher } = useTeachers()
+  const { mutateAsync: deleteSubjectFn } = useDeleteSubject()
 
   const { data: subject } = useQuery({
     queryKey: ['subject', id],
@@ -79,8 +80,6 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
     }
   }, [subject, mode, setValue])
 
-  const { mutateAsync: deleteSubjectFn } = useDeleteSubject()
-
   const { mutateAsync: createSubjectFn, isPending } = useMutation({
     mutationFn: createSubject,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subjects'] }),
@@ -89,19 +88,30 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
   async function handleCreateOrUpdateSubject(data: CreateSubjectSchema) {
     const active = data.active ? 1 : 0
 
-    try {
-      await createSubjectFn({
-        name: data.name,
-        description: data.description,
-        color: data.color,
-        active,
-        teacher_id: data.teacherId,
-        workload_hours: Number(data.workloadHours),
-      })
-      router.back()
-      toast.success('Matéria cadastrada com sucesso')
-    } catch (error) {
-      console.log(error)
+    if (mode === 'create') {
+      try {
+        await createSubjectFn({
+          name: data.name,
+          description: data.description,
+          color: data.color,
+          active,
+          teacher_id: data.teacherId,
+          workload_hours: Number(data.workloadHours),
+        })
+        router.back()
+        toast.success('Matéria cadastrada com sucesso')
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    if (mode === 'edit') {
+      try {
+        router.back()
+        toast.success('Matéria editada com sucesso')
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 
