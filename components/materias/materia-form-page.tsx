@@ -54,7 +54,8 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
     })
 
   const { data: teachers, isPending: isLoadingTeacher } = useTeachers()
-  const { mutateAsync: deleteSubjectFn } = useDeleteSubject()
+  const { mutateAsync: deleteSubjectFn, isPending: isDeletingSubject } =
+    useDeleteSubject()
 
   const { data: subject } = useQuery({
     queryKey: ['subject', id],
@@ -114,13 +115,17 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
       }
     }
   }
+  console.log(id)
 
   return (
     <div className="space-y-6">
       <FormHeader
-        isPending
-        entityId=""
-        handleDelete={() => deleteSubjectFn}
+        isPending={isDeletingSubject}
+        entityId={id}
+        handleDelete={async (id) => {
+          await deleteSubjectFn({ id })
+          router.back()
+        }}
         mode={mode}
         label="Nova"
         title="Matéria"

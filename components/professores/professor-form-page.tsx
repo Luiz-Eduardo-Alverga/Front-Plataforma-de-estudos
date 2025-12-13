@@ -7,17 +7,16 @@ import z from 'zod'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Switch } from '../ui/switch'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createProfessor } from '@/services/teacher/create-professor'
 import toast from 'react-hot-toast'
-import { getProfessor } from '@/services/teacher/get-professor'
 import { useEffect } from 'react'
-import { updateProfessor } from '@/services/teacher/update-professor'
-import { deleteTeacher } from '@/services/teacher/delete-professor'
 import { FormHeader } from '../header/form-header'
 import { FormButton } from '../button/form-button'
+import { useCreateTeacher } from '@/hooks/teachers/use-create-teacher'
+import { useEditTeacher } from '@/hooks/teachers/use-edit-teacher'
+import { useDeleteTeacher } from '@/hooks/teachers/use-delete-teacher'
+import { useTeacher } from '@/hooks/teachers/use-get-teacher'
 
-const createProfessorFormSchema = z.object({
+const createTeacherFormSchema = z.object({
   name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
   email: z.email('Email inválido'),
   phone: z.string().min(10, 'Telefone inválido'),
@@ -26,72 +25,55 @@ const createProfessorFormSchema = z.object({
   active: z.boolean().nullable(),
 })
 
-type CreateProfessorFormData = z.infer<typeof createProfessorFormSchema>
+type CreateTeacherFormData = z.infer<typeof createTeacherFormSchema>
 
-interface ProfessorFormProps {
+interface TeacherFormProps {
   id: string
   mode: 'create' | 'edit'
 }
 
-export function ProfessorForm({ mode, id }: ProfessorFormProps) {
+export function TeacherForm({ mode, id }: TeacherFormProps) {
+  const router = useRouter()
   const {
     register,
     handleSubmit,
     control,
     setValue,
     formState: { errors },
-  } = useForm<CreateProfessorFormData>({
-    resolver: zodResolver(createProfessorFormSchema),
+  } = useForm<CreateTeacherFormData>({
+    resolver: zodResolver(createTeacherFormSchema),
     defaultValues: {
       active: true,
     },
   })
 
-  const router = useRouter()
-  const queryClient = useQueryClient()
+  const { mutateAsync: createProfessorFn, isPending: isCreatingTeacher } =
+    useCreateTeacher()
+  const { mutateAsync: updateProfessorFn, isPending: isUpdatingTeacher } =
+    useEditTeacher()
+  const { mutateAsync: deleteProfessorFn, isPending } = useDeleteTeacher()
+  const { data: teacher } = useTeacher({ id, mode })
 
-  const { data: professor } = useQuery({
-    queryKey: ['professor', id],
-    queryFn: () => getProfessor({ teacherId: id }),
-    enabled: mode === 'edit',
-  })
+  const isSubmitingTeacher =
+    mode === 'create' ? isCreatingTeacher : isUpdatingTeacher
 
   useEffect(() => {
-    if (mode === 'edit' && professor) {
-      setValue('name', professor.name)
-      setValue('email', professor.email)
-      setValue('phone', professor.phone)
-      setValue('speciality', professor.speciality)
+    if (mode === 'edit' && teacher) {
+      setValue('name', teacher.name)
+      setValue('email', teacher.email)
+      setValue('phone', teacher.phone)
+      setValue('speciality', teacher.speciality)
       setValue(
         'admissionDate',
-        professor.admissionDate
-          ? new Date(professor.admissionDate).toISOString().split('T')[0]
+        teacher.admissionDate
+          ? new Date(teacher.admissionDate).toISOString().split('T')[0]
           : '',
       )
-      setValue('active', professor.active === 1)
+      setValue('active', teacher.active === 1)
     }
-  }, [professor, mode, setValue])
+  }, [teacher, mode, setValue])
 
-  const { mutateAsync: createProfessorFn, isPending: isCreatingProfessor } =
-    useMutation({
-      mutationFn: createProfessor,
-    })
-  const { mutateAsync: updateProfessorFn, isPending: isUpdatingProfessor } =
-    useMutation({
-      mutationFn: updateProfessor,
-    })
-
-  const isSubmittingProfessor =
-    mode === 'create' ? isCreatingProfessor : isUpdatingProfessor
-
-  const { mutateAsync: deleteProfessorFn, isPending } = useMutation({
-    mutationFn: (id: string) => deleteTeacher({ id }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['professores'] })
-    },
-  })
-
-  async function handleCreateOrUpdateProfessor(data: CreateProfessorFormData) {
+  async function handleCreateOrUpdateProfessor(data: CreateTeacherFormData) {
     const active = data.active ? 1 : 0
 
     if (mode === 'create') {
@@ -112,10 +94,10 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
       }
     }
 
-    if (mode === 'edit' && professor) {
+    if (mode === 'edit' && teacher) {
       try {
         await updateProfessorFn({
-          teacherId: professor.id,
+          teacherId: teacher.id,
           teacherData: {
             name: data.name,
             phone: data.phone,
@@ -134,25 +116,16 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
     }
   }
 
-  async function handleDeleteProfessor() {
-    if (!professor) return
-
-    try {
-      await deleteProfessorFn(professor.id)
-      router.back()
-      toast.success('Professor deletado com sucesso')
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   return (
     <div className="space-y-6">
       <FormHeader
         isPending={isPending}
         entityId={id}
         mode={mode}
-        handleDelete={handleDeleteProfessor}
+        handleDelete={async (id) => {
+          await deleteProfessorFn({ id })
+          router.back()
+        }}
         label="Novo"
         title="Professor"
         description="o professor"
@@ -176,10 +149,10 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
               )}
             </div>
 
-            {mode === 'edit' && professor && (
+            {mode === 'edit' && teacher && (
               <div className="space-y-2 col-span-1">
                 <Label htmlFor="codigo">Código</Label>
-                <Input value={professor?.id} disabled />
+                <Input value={teacher?.id} disabled />
               </div>
             )}
           </div>
@@ -238,7 +211,7 @@ export function ProfessorForm({ mode, id }: ProfessorFormProps) {
           </div>
         </div>
 
-        <FormButton mode={mode} isSubmiting={isSubmittingProfessor} />
+        <FormButton mode={mode} isSubmiting={isSubmitingTeacher} />
       </form>
     </div>
   )
