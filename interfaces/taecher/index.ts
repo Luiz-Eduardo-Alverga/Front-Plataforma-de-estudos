@@ -1,6 +1,6 @@
 import { PaginationLinks, PaginationMeta } from '../pagination'
 
-export interface Professor {
+export interface Teacher {
   id: string
   name: string
   email: string
@@ -10,21 +10,21 @@ export interface Professor {
   active: 0 | 1
 }
 
-export interface GetProfessoresResponse {
-  data: Professor[]
+export interface GetTeachersResponse {
+  data: Teacher[]
   links: PaginationLinks
   meta: PaginationMeta
 }
 
-export interface CreateProfessorProps {
+export interface CreateTeacher {
   name: string
-  email?: string
+  email?: string | null
   phone: string
-  admission_date?: string
-  speciality?: string
+  admission_date?: string | null
+  speciality?: string | null
   active: 0 | 1
 }
-export interface UpdateProfessorProps {
+export interface UpdateTeacher {
   teacherId: string
-  teacherData: CreateProfessorProps
+  teacherData: CreateTeacher
 }

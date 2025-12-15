@@ -1,9 +1,13 @@
-import { getProfessores } from '@/services/teacher/get-professores'
+import { getTeachers } from '@/services/teacher/get-teachers'
 import { useQuery } from '@tanstack/react-query'
 
-export function useTeachers(page: number = 1) {
+interface useTeachersProps {
+  page?: number
+}
+
+export function useTeachers({ page }: useTeachersProps) {
   return useQuery({
-    queryKey: ['professores', page],
-    queryFn: () => getProfessores({ page }),
+    queryKey: ['teachers', page],
+    queryFn: () => getTeachers({ page }),
   })
 }

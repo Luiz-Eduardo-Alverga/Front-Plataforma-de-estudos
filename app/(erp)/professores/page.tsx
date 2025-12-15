@@ -1,4 +1,4 @@
-import { ProfessoresList } from '@/components/professores/professores-list'
+import { TeachersList } from '@/components/teachers/teachers-list'
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 
@@ -6,10 +6,10 @@ export const metadata: Metadata = {
   title: 'Professores',
 }
 
-export default function ProfessoresListPage() {
+export default function TeachersListPage() {
   return (
     <Suspense>
-      <ProfessoresList />
+      <TeachersList />
     </Suspense>
   )
 }

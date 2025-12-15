@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { CreateSubject } from '@/interfaces/subjects'
+import { CreateSubject } from '@/interfaces/subject'
 import api from '@/lib/axios'
 
 export async function createSubject({

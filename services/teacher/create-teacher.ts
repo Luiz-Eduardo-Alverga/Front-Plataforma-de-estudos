@@ -1,14 +1,14 @@
-import { CreateProfessorProps } from '@/interfaces/taecher'
+import { CreateTeacher } from '@/interfaces/taecher'
 import api from '@/lib/axios'
 
-export async function createProfessor({
+export async function createTeacher({
   name,
   email,
   phone,
   admission_date: admissionDate,
   speciality,
   active,
-}: CreateProfessorProps) {
+}: CreateTeacher) {
   const response = await api.post('/teachers', {
     name,
     email,

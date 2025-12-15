@@ -6,18 +6,24 @@ import {
 } from 'lucide-react'
 
 import { Button } from './ui/button'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export interface PaginationProps {
   pageIndex: number
   pages: number
-  onPageChange: (pageIndex: number) => Promise<void> | void
 }
 
-export function Pagination({
-  pageIndex,
-  pages,
-  onPageChange,
-}: PaginationProps) {
+export function Pagination({ pageIndex, pages }: PaginationProps) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  function onPageChange(newPage: number) {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', String(newPage))
+
+    router.push(`?${params.toString()}`)
+  }
+
   return (
     <>
       {pages > 0 && (

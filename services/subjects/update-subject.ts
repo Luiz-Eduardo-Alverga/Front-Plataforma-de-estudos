@@ -1,4 +1,4 @@
-import { UpdateSubject } from '@/interfaces/subjects'
+import { UpdateSubject } from '@/interfaces/subject'
 import api from '@/lib/axios'
 
 export async function updateSubject({ subjectId, subjectData }: UpdateSubject) {

@@ -11,32 +11,26 @@ import {
   TableRow,
 } from '../ui/table'
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { AlertDialog } from '../ui/alert-dialog'
 import EmptyStateImage from '@/public/undraw_professor_d7zn.svg'
 import { Pagination } from '../pagination'
 import { ListHeader } from '../header/list-header'
 import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
 
-import { DeleteEntityDialog } from '../modal/delet-entity'
+import { DeleteEntityDialog } from '../modal/delete-entity'
 import { EmptyState } from '../empty-state'
 import { useDeleteTeacher } from '@/hooks/teachers/use-delete-teacher'
 import { useTeachers } from '@/hooks/teachers/use-get-teachers'
 
-export function ProfessoresList() {
+export function TeachersList() {
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page') ?? '1')
-  const router = useRouter()
 
-  const { data: response } = useTeachers()
-  const { mutateAsync: deleteProfessorFn, isPending } = useDeleteTeacher()
-
-  function handlePaginate(newPage: number) {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(newPage))
-
-    router.push(`?${params.toString()}`)
-  }
+  const { data: response } = useTeachers({
+    page,
+  })
+  const { mutateAsync: deleteTeacherFn, isPending } = useDeleteTeacher()
 
   return (
     <div className="space-y-4">
@@ -120,7 +114,7 @@ export function ProfessoresList() {
 
                       <DeleteEntityDialog
                         deleteFn={async (id) => {
-                          await deleteProfessorFn({ id })
+                          await deleteTeacherFn({ id })
                         }}
                         entityId={String(response.id)}
                         entityName="professor"
@@ -136,11 +130,7 @@ export function ProfessoresList() {
       )}
 
       {response && response.meta.last_page > 1 && (
-        <Pagination
-          pageIndex={page}
-          pages={response.meta.last_page}
-          onPageChange={handlePaginate}
-        />
+        <Pagination pageIndex={page} pages={response.meta.last_page} />
       )}
     </div>
   )

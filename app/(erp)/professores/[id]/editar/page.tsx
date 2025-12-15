@@ -1,6 +1,11 @@
-import { TeacherForm } from '@/components/professores/professor-form-page'
+import { TeacherForm } from '@/components/teachers/teacher-form-page'
+import { Metadata } from 'next'
 
-export default async function ProfessorEditFormPage({
+export const metadata: Metadata = {
+  title: 'Editar Professor',
+}
+
+export default async function TeacherEditFormPage({
   params,
 }: {
   params: Promise<{ id: string }>

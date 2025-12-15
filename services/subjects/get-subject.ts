@@ -1,4 +1,4 @@
-import { Subject } from '@/interfaces/subjects'
+import { Subject } from '@/interfaces/subject'
 import api from '@/lib/axios'
 
 interface GetSubjectParams {

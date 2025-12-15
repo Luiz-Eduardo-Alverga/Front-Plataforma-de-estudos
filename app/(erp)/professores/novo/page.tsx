@@ -1,7 +1,10 @@
-'use client'
+import { TeacherForm } from '@/components/teachers/teacher-form-page'
+import { Metadata } from 'next'
 
-import { TeacherForm } from '@/components/professores/professor-form-page'
+export const metadata: Metadata = {
+  title: 'Novo Professor',
+}
 
-export default function ProfessorCreateFormPage() {
+export default function NewTeacherPage() {
   return <TeacherForm mode="create" id="" />
 }

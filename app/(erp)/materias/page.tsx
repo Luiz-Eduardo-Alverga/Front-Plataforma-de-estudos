@@ -1,10 +1,15 @@
-import { MateriasList } from '@/components/materias/materias-list'
+import { SubjectsList } from '@/components/subjects/subjects-list'
+import { Metadata } from 'next'
 import { Suspense } from 'react'
 
-export default function MateriasListPage() {
+export const metadata: Metadata = {
+  title: 'Materias',
+}
+
+export default function SubjectsListPage() {
   return (
     <Suspense>
-      <MateriasList />
+      <SubjectsList />
     </Suspense>
   )
 }

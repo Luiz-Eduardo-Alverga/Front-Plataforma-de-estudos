@@ -3,28 +3,21 @@
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Textarea } from '../ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select'
 import z from 'zod'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Switch } from '../ui/switch'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { FormButton } from '../button/form-button'
 import { FormHeader } from '../header/form-header'
-import { Professor } from '@/interfaces/taecher'
-import { createSubject } from '@/services/subjects/create-subject'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { getSubject } from '@/services/subjects/get-subject'
 import { useEffect } from 'react'
 import { useDeleteSubject } from '@/hooks/subjects/use-delete-subject'
-import { useTeachers } from '@/hooks/teachers/use-get-teachers'
+import { useSubject } from '@/hooks/subjects/use-subject'
+import { useCreateSubject } from '@/hooks/subjects/use-create-subject'
+import { useUpdateSubject } from '@/hooks/subjects/use-update-subject'
+import { CreateSubject } from '@/interfaces/subject'
+import { TeacherSelectField } from '../selects/teacher-select'
 
 const createSubjectSchema = z.object({
   name: z.string(),
@@ -42,9 +35,9 @@ interface MateriaPageProps {
   mode: 'create' | 'edit'
 }
 
-export function MateriaForm({ mode, id }: MateriaPageProps) {
+export function SubjectForm({ mode, id }: MateriaPageProps) {
   const router = useRouter()
-  const queryClient = useQueryClient()
+
   const { register, handleSubmit, control, setValue } =
     useForm<CreateSubjectSchema>({
       resolver: zodResolver(createSubjectSchema),
@@ -53,15 +46,11 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
       },
     })
 
-  const { data: teachers, isPending: isLoadingTeacher } = useTeachers()
+  const { data: subject } = useSubject({ id, mode })
+  const { mutateAsync: createSubjectFn, isPending } = useCreateSubject()
+  const { mutateAsync: updateSubjectFn } = useUpdateSubject()
   const { mutateAsync: deleteSubjectFn, isPending: isDeletingSubject } =
     useDeleteSubject()
-
-  const { data: subject } = useQuery({
-    queryKey: ['subject', id],
-    queryFn: () => getSubject({ subjectId: id }),
-    enabled: mode === 'edit',
-  })
 
   useEffect(() => {
     if (mode === 'edit' && subject) {
@@ -81,24 +70,28 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
     }
   }, [subject, mode, setValue])
 
-  const { mutateAsync: createSubjectFn, isPending } = useMutation({
-    mutationFn: createSubject,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['subjects'] }),
-  })
-
   async function handleCreateOrUpdateSubject(data: CreateSubjectSchema) {
-    const active = data.active ? 1 : 0
+    const {
+      name,
+      description,
+      color,
+      teacherId,
+      workloadHours,
+      active: isActive,
+    } = data
+
+    const subjectData: CreateSubject = {
+      name,
+      description,
+      color,
+      active: isActive ? 1 : 0,
+      teacher_id: teacherId,
+      workload_hours: Number(workloadHours),
+    }
 
     if (mode === 'create') {
       try {
-        await createSubjectFn({
-          name: data.name,
-          description: data.description,
-          color: data.color,
-          active,
-          teacher_id: data.teacherId,
-          workload_hours: Number(data.workloadHours),
-        })
+        await createSubjectFn(subjectData)
         router.back()
         toast.success('Matéria cadastrada com sucesso')
       } catch (error) {
@@ -108,6 +101,10 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
 
     if (mode === 'edit') {
       try {
+        await updateSubjectFn({
+          subjectId: id,
+          subjectData,
+        })
         router.back()
         toast.success('Matéria editada com sucesso')
       } catch (error) {
@@ -115,7 +112,6 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
       }
     }
   }
-  console.log(id)
 
   return (
     <div className="space-y-6">
@@ -172,38 +168,11 @@ export function MateriaForm({ mode, id }: MateriaPageProps) {
             <div className="grid grid-cols-7 gap-6">
               <div className="space-y-2 col-span-3">
                 <Label htmlFor="professor">Professor</Label>
-                <Controller
-                  name="teacherId"
+                <TeacherSelectField
                   control={control}
-                  render={({ field }) => (
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value || undefined}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um professor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {isLoadingTeacher ? (
-                          <SelectItem value="carregando">
-                            Carregando...
-                          </SelectItem>
-                        ) : (
-                          teachers &&
-                          teachers.data
-                            .filter((p: Professor) => p.active)
-                            .map((professor) => (
-                              <SelectItem
-                                key={professor.id}
-                                value={String(professor.id)}
-                              >
-                                {professor.name}
-                              </SelectItem>
-                            ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  )}
+                  name="teacherId"
+                  placeholder="Selecione um professor"
+                  onlyActive
                 />
               </div>
 

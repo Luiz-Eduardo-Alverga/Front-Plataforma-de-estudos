@@ -2,7 +2,7 @@ import { ArrowLeft, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { useRouter } from 'next/navigation'
 import { AlertDialog, AlertDialogTrigger } from '../ui/alert-dialog'
-import { DeleteEntityDialog } from '../modal/delet-entity'
+import { DeleteEntityDialog } from '../modal/delete-entity'
 
 interface FormHeaderProps {
   mode: 'create' | 'edit'

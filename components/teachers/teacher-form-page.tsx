@@ -12,9 +12,10 @@ import { useEffect } from 'react'
 import { FormHeader } from '../header/form-header'
 import { FormButton } from '../button/form-button'
 import { useCreateTeacher } from '@/hooks/teachers/use-create-teacher'
-import { useEditTeacher } from '@/hooks/teachers/use-edit-teacher'
+import { useUpdateTeacher } from '@/hooks/teachers/use-update-teacher'
 import { useDeleteTeacher } from '@/hooks/teachers/use-delete-teacher'
 import { useTeacher } from '@/hooks/teachers/use-get-teacher'
+import { CreateTeacher } from '@/interfaces/taecher'
 
 const createTeacherFormSchema = z.object({
   name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
@@ -47,12 +48,12 @@ export function TeacherForm({ mode, id }: TeacherFormProps) {
     },
   })
 
-  const { mutateAsync: createProfessorFn, isPending: isCreatingTeacher } =
-    useCreateTeacher()
-  const { mutateAsync: updateProfessorFn, isPending: isUpdatingTeacher } =
-    useEditTeacher()
-  const { mutateAsync: deleteProfessorFn, isPending } = useDeleteTeacher()
   const { data: teacher } = useTeacher({ id, mode })
+  const { mutateAsync: createTeacherFn, isPending: isCreatingTeacher } =
+    useCreateTeacher()
+  const { mutateAsync: updateTeacherFn, isPending: isUpdatingTeacher } =
+    useUpdateTeacher()
+  const { mutateAsync: deleteTeacherFn, isPending } = useDeleteTeacher()
 
   const isSubmitingTeacher =
     mode === 'create' ? isCreatingTeacher : isUpdatingTeacher
@@ -73,20 +74,28 @@ export function TeacherForm({ mode, id }: TeacherFormProps) {
     }
   }, [teacher, mode, setValue])
 
-  async function handleCreateOrUpdateProfessor(data: CreateTeacherFormData) {
-    const active = data.active ? 1 : 0
+  async function handleCreateOrUpdateTeacher(data: CreateTeacherFormData) {
+    const {
+      name,
+      admissionDate,
+      email,
+      phone,
+      speciality,
+      active: isActive,
+    } = data
+
+    const teacherData: CreateTeacher = {
+      name,
+      admission_date: admissionDate,
+      email,
+      phone,
+      speciality,
+      active: isActive ? 1 : 0,
+    }
 
     if (mode === 'create') {
       try {
-        await createProfessorFn({
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          speciality: data.speciality || undefined,
-          admission_date: data.admissionDate || undefined,
-          active,
-        })
-
+        await createTeacherFn(teacherData)
         router.back()
         toast.success('Professor criado com sucesso!')
       } catch (error) {
@@ -96,18 +105,10 @@ export function TeacherForm({ mode, id }: TeacherFormProps) {
 
     if (mode === 'edit' && teacher) {
       try {
-        await updateProfessorFn({
+        await updateTeacherFn({
           teacherId: teacher.id,
-          teacherData: {
-            name: data.name,
-            phone: data.phone,
-            email: data.email,
-            speciality: data.speciality || undefined,
-            admission_date: data.admissionDate || undefined,
-            active,
-          },
+          teacherData,
         })
-
         router.back()
         toast.success('Professor editado com sucesso!')
       } catch (error) {
@@ -123,7 +124,7 @@ export function TeacherForm({ mode, id }: TeacherFormProps) {
         entityId={id}
         mode={mode}
         handleDelete={async (id) => {
-          await deleteProfessorFn({ id })
+          await deleteTeacherFn({ id })
           router.back()
         }}
         label="Novo"
@@ -132,7 +133,7 @@ export function TeacherForm({ mode, id }: TeacherFormProps) {
       />
 
       <form
-        onSubmit={handleSubmit(handleCreateOrUpdateProfessor)}
+        onSubmit={handleSubmit(handleCreateOrUpdateTeacher)}
         className="bg-card rounded-lg border p-4 sm:p-6"
       >
         <div className="space-y-6">

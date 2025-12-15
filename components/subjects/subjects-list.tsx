@@ -11,35 +11,24 @@ import {
 } from '../ui/table'
 
 import { ListHeader } from '../header/list-header'
-import { useQuery } from '@tanstack/react-query'
-import { getSubjects } from '@/services/subjects/get-subjects'
 import { AlertDialog } from '../ui/alert-dialog'
 import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
-import { DeleteEntityDialog } from '../modal/delet-entity'
+import { DeleteEntityDialog } from '../modal/delete-entity'
 import { Pagination } from '../pagination'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { EmptyState } from '../empty-state'
 import EmptyStateImage from '@/public/undraw_teaching_58yg.svg'
 import { useDeleteSubject } from '@/hooks/subjects/use-delete-subject'
+import { useSubjects } from '@/hooks/subjects/use-subjects'
 
-export function MateriasList() {
+export function SubjectsList() {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const page = Number(searchParams.get('page') ?? '1')
 
-  const { data: response } = useQuery({
-    queryKey: ['subjects'],
-    queryFn: getSubjects,
+  const { data: response } = useSubjects({
+    page,
   })
-
   const { mutateAsync: deleteSubjectFn, isPending } = useDeleteSubject()
-
-  function handlePaginate(newPage: number) {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('page', String(newPage))
-
-    router.push(`?${params.toString()}`)
-  }
 
   return (
     <div className="space-y-4">
@@ -124,11 +113,7 @@ export function MateriasList() {
       )}
 
       {response && response.meta.last_page > 1 && (
-        <Pagination
-          pageIndex={page}
-          pages={response.meta.last_page}
-          onPageChange={handlePaginate}
-        />
+        <Pagination pageIndex={page} pages={response.meta.last_page} />
       )}
     </div>
   )

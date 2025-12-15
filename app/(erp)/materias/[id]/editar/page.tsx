@@ -1,11 +1,16 @@
-import { MateriaForm } from '@/components/materias/materia-form-page'
+import { SubjectForm } from '@/components/subjects/subject-form-page'
+import { Metadata } from 'next'
 
-export default async function MateriaEditPage({
+export const metadata: Metadata = {
+  title: 'Editar Matéria',
+}
+
+export default async function SubjectEditPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
 
-  return <MateriaForm mode="edit" id={id} />
+  return <SubjectForm mode="edit" id={id} />
 }
