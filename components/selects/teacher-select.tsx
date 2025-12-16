@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button'
 
 import { Control, Controller, FieldValues, Path } from 'react-hook-form'
-import { Teacher } from '@/interfaces/taecher'
+import { Teacher } from '@/interfaces/teacher'
 import { useInfiniteTeachers } from '@/hooks/teachers/use-infinite-teachrs'
 
 type TeacherSelectProps = {

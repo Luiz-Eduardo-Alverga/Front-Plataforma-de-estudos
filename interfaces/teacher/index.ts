@@ -28,3 +28,13 @@ export interface UpdateTeacher {
   teacherId: string
   teacherData: CreateTeacher
 }
+
+export interface SimpleTeacherSubject {
+  id: string
+  name: string
+}
+
+export interface SimpleTeacher {
+  id: string
+  name: string
+}

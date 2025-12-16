@@ -15,12 +15,15 @@ import { useCreateTeacher } from '@/hooks/teachers/use-create-teacher'
 import { useUpdateTeacher } from '@/hooks/teachers/use-update-teacher'
 import { useDeleteTeacher } from '@/hooks/teachers/use-delete-teacher'
 import { useTeacher } from '@/hooks/teachers/use-get-teacher'
-import { CreateTeacher } from '@/interfaces/taecher'
+import { CreateTeacher } from '@/interfaces/teacher'
+import { NumberFormatBase } from 'react-number-format'
 
 const createTeacherFormSchema = z.object({
   name: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
   email: z.email('Email inválido'),
-  phone: z.string().min(10, 'Telefone inválido'),
+  phone: z
+    .string()
+    .refine((v) => v.length === 10 || v.length === 11, 'Telefone inválido'),
   speciality: z.string().nullable(),
   admissionDate: z.string().nullable(),
   active: z.boolean().nullable(),
@@ -117,6 +120,26 @@ export function TeacherForm({ mode, id }: TeacherFormProps) {
     }
   }
 
+  const onlyDigits = (v: string) => v.replace(/\D/g, '').slice(0, 11)
+
+  const formatPhone = (value: string) => {
+    const d = onlyDigits(value)
+    if (!d) return ''
+
+    const ddd = d.slice(0, 2)
+    const rest = d.slice(2)
+
+    if (d.length <= 10) {
+      const p1 = rest.slice(0, 4)
+      const p2 = rest.slice(4, 8)
+      return `(${ddd}) ${p2 ? `${p1}-${p2}` : p1}`
+    }
+
+    const p1 = rest.slice(0, 5)
+    const p2 = rest.slice(5, 9)
+    return `(${ddd}) ${p2 ? `${p1}-${p2}` : p1}`
+  }
+
   return (
     <div className="space-y-6">
       <FormHeader
@@ -173,10 +196,20 @@ export function TeacherForm({ mode, id }: TeacherFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="telefone">Telefone</Label>
-              <Input
-                {...register('phone')}
-                type="tel"
-                placeholder="(11) 98765-4321"
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <NumberFormatBase
+                    customInput={Input}
+                    value={field.value ?? ''}
+                    format={(val) => formatPhone(val)}
+                    removeFormatting={(val) => onlyDigits(val)}
+                    onValueChange={(values) => field.onChange(values.value)}
+                    inputMode="numeric"
+                    placeholder="(83) 3225-7000"
+                  />
+                )}
               />
               {errors.phone && (
                 <p className="text-sm text-red-600">{errors.phone.message}</p>

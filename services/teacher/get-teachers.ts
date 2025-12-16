@@ -1,4 +1,4 @@
-import { GetTeachersResponse } from '@/interfaces/taecher'
+import { GetTeachersResponse } from '@/interfaces/teacher'
 import api from '@/lib/axios'
 
 interface GetTeachersParams {

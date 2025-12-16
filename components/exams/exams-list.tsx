@@ -13,22 +13,22 @@ import {
 import { ListHeader } from '../header/list-header'
 import { AlertDialog } from '../ui/alert-dialog'
 import { TableDropdwonMenu } from '../dropdown/table-dropdown-menu'
-import { useClassrooms } from '@/hooks/classrooms/use-classrooms'
 import { Pagination } from '../pagination'
 import { useSearchParams } from 'next/navigation'
-import { UseDeleteClassroom } from '@/hooks/classrooms/use-delete-classroom'
 import { DeleteEntityDialog } from '../modal/delete-entity'
 import { EmptyState } from '../empty-state'
 import EmptyStateImage from '@/public/undraw_online-learning_tgmv.svg'
+import { useExams } from '@/hooks/exams/use-exams'
+import { useDeleteExam } from '@/hooks/exams/use-delete-exam'
 
-export function ClassroomsList() {
+export function ExamsList() {
   const searchParams = useSearchParams()
   const page = Number(searchParams.get('page') || '1')
 
-  const { data: response } = useClassrooms({
+  const { data: response } = useExams({
     page,
   })
-  const { mutateAsync: deleteClassroomFn, isPending } = UseDeleteClassroom()
+  const { mutateAsync: deleteExamFn, isPending } = useDeleteExam()
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -65,21 +65,21 @@ export function ClassroomsList() {
   return (
     <div className="space-y-4">
       <ListHeader
-        title="Gerenciar Aulas"
-        description="Cadastre e gerencie as aulas da plataforma"
+        title="Gerenciar Provas"
+        description="Cadastre e gerencie as provas da plataforma"
         hasData={!!response && response.data.length > 0}
-        newButtonLabel="Nova Aula"
-        newButtonHref="aulas"
+        newButtonLabel="Nova prova"
+        newButtonHref="provas"
       />
 
       {!response ||
         (response.data.length === 0 && (
           <EmptyState
-            title="Nenhuma aula cadastrada"
-            description="Comece adicionando aulas à plataforma para organizar o cronograma de ensino."
-            footerText="Adicionar Primeira Aula"
+            title="Nenhuma prova cadastrada"
+            description="Comece adicionando provas à plataforma para organizar o cronograma de ensino."
+            footerText="Adicionar Primeira prova"
             image={EmptyStateImage}
-            href="aulas"
+            href="provas"
           />
         ))}
 
@@ -88,7 +88,7 @@ export function ClassroomsList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Aula</TableHead>
+                <TableHead>Prova</TableHead>
                 <TableHead>Data/Hora</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Duração</TableHead>
@@ -98,13 +98,13 @@ export function ClassroomsList() {
             </TableHeader>
             <TableBody>
               {response &&
-                response.data.map((classroom) => (
-                  <TableRow key={classroom.id}>
+                response.data.map((exam) => (
+                  <TableRow key={exam.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{classroom.title}</p>
+                        <p className="font-medium">{exam.title}</p>
                         <p className="text-muted-foreground">
-                          {classroom.subject.name}
+                          {exam.subject.name}
                         </p>
                       </div>
                     </TableCell>
@@ -112,40 +112,40 @@ export function ClassroomsList() {
                       <div className="flex flex-col gap-1">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {formatDate(classroom.starts_at)}
+                          {formatDate(exam.starts_at)}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {formatTime(classroom.starts_at)}
+                          {formatTime(exam.starts_at)}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {classroom.type === 'presencial' ? (
+                        {exam.type === 'presencial' ? (
                           <MapPin className="h-4 w-4 text-muted-foreground" />
                         ) : (
                           <Monitor className="h-4 w-4 text-muted-foreground" />
                         )}
-                        <span className="capitalize">{classroom.type}</span>
+                        <span className="capitalize">{exam.type}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{classroom.duration_minutes} min</TableCell>
+                    <TableCell>{exam.duration_minutes} min</TableCell>
                     <TableCell>
-                      <Badge variant={getStatusVariant(classroom.status)}>
-                        {classroom.status}
+                      <Badge variant={getStatusVariant(exam.status)}>
+                        {exam.status}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <AlertDialog>
-                        <TableDropdwonMenu itemHref="aulas" id={classroom.id} />
+                        <TableDropdwonMenu itemHref="provas" id={exam.id} />
 
                         <DeleteEntityDialog
                           deleteFn={async (id) => {
-                            await deleteClassroomFn({ id })
+                            await deleteExamFn({ id })
                           }}
-                          entityId={String(classroom.id)}
-                          entityName="aula"
+                          entityId={String(exam.id)}
+                          entityName="prova"
                           isLoading={isPending}
                         />
                       </AlertDialog>

@@ -1,4 +1,4 @@
-import { UpdateTeacher } from '@/interfaces/taecher'
+import { UpdateTeacher } from '@/interfaces/teacher'
 import api from '@/lib/axios'
 
 export async function updateTeacher({ teacherId, teacherData }: UpdateTeacher) {

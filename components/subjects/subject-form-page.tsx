@@ -22,7 +22,7 @@ import { TeacherSelectField } from '../selects/teacher-select'
 const createSubjectSchema = z.object({
   name: z.string(),
   description: z.string(),
-  workloadHours: z.string(),
+  workloadHours: z.number().max(9999),
   teacherId: z.string(),
   active: z.boolean().nullable(),
   color: z.string(),
@@ -56,7 +56,7 @@ export function SubjectForm({ mode, id }: MateriaPageProps) {
     if (mode === 'edit' && subject) {
       setValue('name', subject.name)
       setValue('description', subject.description)
-      setValue('workloadHours', String(subject.workload_hours))
+      setValue('workloadHours', subject.workload_hours)
       setValue('color', subject.color)
       setValue('active', subject.active === 1)
 
@@ -150,7 +150,7 @@ export function SubjectForm({ mode, id }: MateriaPageProps) {
                   id="cargaHoraria"
                   type="number"
                   placeholder="Ex: 80"
-                  {...register('workloadHours')}
+                  {...register('workloadHours', { valueAsNumber: true })}
                 />
               </div>
             </div>

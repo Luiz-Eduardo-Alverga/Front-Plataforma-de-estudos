@@ -9,14 +9,14 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { id: 'materias', label: 'Matérias', icon: BookOpen, href: '/materias' },
-  { id: 'aulas', label: 'Aulas', icon: Video, href: '/aulas' },
   {
     id: 'professores',
     label: 'Professores',
     icon: Users,
     href: '/professores',
   },
+  { id: 'materias', label: 'Matérias', icon: BookOpen, href: '/materias' },
+  { id: 'aulas', label: 'Aulas', icon: Video, href: '/aulas' },
   { id: 'provas', label: 'Provas', icon: FileText, href: '/provas' },
 ]
 

@@ -61,7 +61,7 @@ export function FormHeader({
           <DeleteEntityDialog
             deleteFn={handleDelete}
             entityId={entityId}
-            entityName="matéria"
+            entityName={title || ''}
             isLoading={isPending}
           />
         </AlertDialog>

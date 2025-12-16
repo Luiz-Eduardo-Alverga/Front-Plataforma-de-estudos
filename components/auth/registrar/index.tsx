@@ -51,8 +51,6 @@ export function RegisterUserForm() {
     mutationFn: registerUserFn,
   })
 
-  console.log(isSubmitting)
-
   async function handleRegisterUser(data: RegisterUserFormData) {
     try {
       await registerUser({

@@ -1,6 +1,6 @@
 import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query'
 import { getTeachers } from '@/services/teacher/get-teachers'
-import { GetTeachersResponse } from '@/interfaces/taecher'
+import { GetTeachersResponse } from '@/interfaces/teacher'
 
 type TeachersInfiniteKey = readonly ['teachers', 'infinite']
 

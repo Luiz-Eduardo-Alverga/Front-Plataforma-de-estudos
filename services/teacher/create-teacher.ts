@@ -1,4 +1,4 @@
-import { CreateTeacher } from '@/interfaces/taecher'
+import { CreateTeacher } from '@/interfaces/teacher'
 import api from '@/lib/axios'
 
 export async function createTeacher({

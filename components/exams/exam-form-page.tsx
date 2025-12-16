@@ -11,22 +11,22 @@ import {
   SelectValue,
 } from '../ui/select'
 import { FormHeader } from '../header/form-header'
-import { UseDeleteClassroom } from '@/hooks/classrooms/use-delete-classroom'
 import { useRouter } from 'next/navigation'
-import { useClassroom } from '@/hooks/classrooms/use-get-classroom'
 import z from 'zod'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormButton } from '../button/form-button'
 import { TeacherSelectField } from '../selects/teacher-select'
 import { SubjectSelectField } from '../selects/subject-select'
-import { useCreateClassroom } from '@/hooks/classrooms/use-create-classroom'
 import toast from 'react-hot-toast'
 import { useEffect } from 'react'
-import { useUpdateClassroom } from '@/hooks/classrooms/use-update-classroom'
-import { CreateClassroom } from '@/interfaces/classroom'
+import { useExam } from '@/hooks/exams/use-get-exam'
+import { useCreateExam } from '@/hooks/exams/use-create-exam'
+import { useUpdateExam } from '@/hooks/exams/use-update-exam'
+import { useDeleteExam } from '@/hooks/exams/use-delete-exam'
+import { CreateExam } from '@/interfaces/exam'
 
-const createClassroomSchema = z.object({
+const createExamSchema = z.object({
   title: z.string().min(3, 'O título é obrigatório'),
   description: z.string().min(10, 'A descrição deve ter mais de 10 caracteres'),
   durationMinutes: z
@@ -38,16 +38,17 @@ const createClassroomSchema = z.object({
   teacherId: z.string(),
   type: z.enum(['presencial', 'online', 'hibrida']),
   status: z.enum(['agendada', 'concluida', 'cancelada']),
+  grade: z.number().min(0, 'A nota mínima é 0').max(10, 'A nota máxima é 10'),
 })
 
-type CreateClassroomSchema = z.infer<typeof createClassroomSchema>
+type CreateExamSchema = z.infer<typeof createExamSchema>
 
-interface AulaPageProps {
+interface ExamPageProps {
   id: string
   mode: 'create' | 'edit'
 }
 
-export function ClassroomForm({ mode, id }: AulaPageProps) {
+export function ExamForm({ mode, id }: ExamPageProps) {
   const router = useRouter()
   const {
     register,
@@ -55,32 +56,33 @@ export function ClassroomForm({ mode, id }: AulaPageProps) {
     control,
     setValue,
     formState: { isSubmitting, errors },
-  } = useForm<CreateClassroomSchema>({
-    resolver: zodResolver(createClassroomSchema),
+  } = useForm<CreateExamSchema>({
+    resolver: zodResolver(createExamSchema),
     defaultValues: {
       type: 'presencial',
       status: 'agendada',
     },
   })
 
-  const { data: classroom } = useClassroom({ id, mode })
-  const { mutateAsync: createClassroomFn } = useCreateClassroom()
-  const { mutateAsync: updateClassroomFn } = useUpdateClassroom()
-  const { mutateAsync: deleteClassroomFn, isPending: isDeletingClassroom } =
-    UseDeleteClassroom()
+  const { data: exam } = useExam({ id, mode })
+  const { mutateAsync: createExamFn } = useCreateExam()
+  const { mutateAsync: updateExamFn } = useUpdateExam()
+  const { mutateAsync: deleteExamFn, isPending: isDeletingExam } =
+    useDeleteExam()
 
   useEffect(() => {
-    if (mode === 'edit' && classroom) {
-      setValue('title', classroom.title)
-      setValue('description', classroom.description)
-      setValue('durationMinutes', classroom.duration_minutes)
-      setValue('type', classroom.type)
-      setValue('status', classroom.status)
-      setValue('startsAt', classroom.starts_at)
-      setValue('durationMinutes', classroom.duration_minutes)
+    if (mode === 'edit' && exam) {
+      setValue('title', exam.title)
+      setValue('description', exam.description)
+      setValue('durationMinutes', exam.duration_minutes)
+      setValue('type', exam.type)
+      setValue('status', exam.status)
+      setValue('startsAt', exam.starts_at)
+      setValue('durationMinutes', exam.duration_minutes)
+      setValue('grade', exam.grade)
 
-      const teacherId = String(classroom.teacher.id)
-      const subjectId = String(classroom.subject.id)
+      const teacherId = String(exam.teacher.id)
+      const subjectId = String(exam.subject.id)
 
       const timeout = setTimeout(() => {
         setValue('teacherId', teacherId)
@@ -89,9 +91,9 @@ export function ClassroomForm({ mode, id }: AulaPageProps) {
 
       return () => clearTimeout(timeout)
     }
-  }, [classroom, mode, setValue])
+  }, [exam, mode, setValue])
 
-  async function handleCreateOrUpdateClassroom(data: CreateClassroomSchema) {
+  async function handleCreateOrUpdateExam(data: CreateExamSchema) {
     const {
       title,
       description,
@@ -101,9 +103,10 @@ export function ClassroomForm({ mode, id }: AulaPageProps) {
       subjectId,
       teacherId,
       type,
+      grade,
     } = data
 
-    const classroomData: CreateClassroom = {
+    const examData: CreateExam = {
       title,
       description,
       duration_minutes: Number(durationMinutes),
@@ -112,28 +115,29 @@ export function ClassroomForm({ mode, id }: AulaPageProps) {
       subject_id: subjectId,
       teacher_id: teacherId,
       type,
+      grade,
     }
 
     if (mode === 'create') {
       try {
-        await createClassroomFn(classroomData)
+        await createExamFn(examData)
         router.back()
-        toast.success('Aula criada com sucesso!')
+        toast.success('Prova criada com sucesso!')
       } catch (error) {
-        console.error('Error creating classroom:', error)
+        console.error('Error creating exam:', error)
       }
     }
 
     if (mode === 'edit') {
       try {
-        await updateClassroomFn({
-          classroomId: id,
-          classroomData,
+        await updateExamFn({
+          examId: id,
+          examData,
         })
         router.back()
-        toast.success('Aula editada com sucesso!')
+        toast.success('Prova editada com sucesso!')
       } catch (error) {
-        console.error('Error updating classroom:', error)
+        console.error('Error updating exam:', error)
       }
     }
   }
@@ -141,40 +145,57 @@ export function ClassroomForm({ mode, id }: AulaPageProps) {
   return (
     <div className="space-y-6">
       <FormHeader
-        title="Aula"
+        title="Prova"
         mode={mode}
-        description="a aula"
+        description="a prova"
         label="Nova"
         entityId={id}
         handleDelete={async (id) => {
-          await deleteClassroomFn({ id })
+          await deleteExamFn({ id })
           router.back()
         }}
-        isPending={isDeletingClassroom}
+        isPending={isDeletingExam}
       />
 
       <form
-        onSubmit={handleSubmit(handleCreateOrUpdateClassroom)}
+        onSubmit={handleSubmit(handleCreateOrUpdateExam)}
         className="bg-card rounded-lg border p-4 sm:p-6"
       >
         <div className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="titulo">Título da Aula</Label>
-            <Input
-              id="titulo"
-              placeholder="Ex: Introdução aos Limites"
-              {...register('title')}
-            />
-            {errors.title && (
-              <p className="text-sm text-red-600">{errors.title.message}</p>
-            )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="titulo">Título da Prova</Label>
+              <Input
+                id="titulo"
+                placeholder="Ex: Introdução aos Limites"
+                {...register('title')}
+              />
+              {errors.title && (
+                <p className="text-sm text-red-600">{errors.title.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="grade">Valor Total (pontos)</Label>
+              <Input
+                id="grade"
+                type="number"
+                placeholder="Ex: 10"
+                {...register('grade', { valueAsNumber: true })}
+                max={10}
+                min={0}
+              />
+              {errors.grade && (
+                <p className="text-sm text-red-600">{errors.grade.message}</p>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="descricao">Descrição</Label>
             <Textarea
               id="descricao"
-              placeholder="Descrição da aula"
+              placeholder="Descrição da prova"
               rows={4}
               {...register('description')}
             />

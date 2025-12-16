@@ -1,4 +1,4 @@
-import { Teacher } from '@/interfaces/taecher'
+import { Teacher } from '@/interfaces/teacher'
 import api from '@/lib/axios'
 
 interface GetTeacherParams {
