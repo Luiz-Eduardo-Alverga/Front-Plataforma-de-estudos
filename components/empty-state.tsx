@@ -17,7 +17,7 @@ export function EmptyState({
   footerText,
   image,
   title,
-  href
+  href,
 }: EmptyStateProps) {
   const router = useRouter()
 

@@ -58,8 +58,8 @@ export function RegisterUserForm() {
         email: data.email,
         password: data.password,
       })
-      toast.success('Conta criada com sucesso! Vocẽ já pode fazer login.')
-      router.push('/login')
+      toast.success('Conta criada e Login realizado com sucesso.')
+      router.push('/dashboard')
     } catch (error) {
       toast.error('Erro ao criar conta. Tente novamente mais tarde.')
     }

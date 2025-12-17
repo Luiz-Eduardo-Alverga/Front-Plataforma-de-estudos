@@ -11,11 +11,13 @@ export async function registerUserFn({
   email,
   password,
 }: RegisterUserBody) {
-  const response = await api.post('/users', {
+  const response = await api.post('/register', {
     name,
     email,
     password,
   })
+
+  localStorage.setItem('token', response.data.token)
 
   return response.data
 }
